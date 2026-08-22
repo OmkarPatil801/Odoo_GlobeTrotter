@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import {
   CalendarDays,
@@ -18,23 +19,50 @@ import Button from '../components/ui/Button'
 import ItineraryDay from '../components/itinerary/ItineraryDay'
 import { formatCurrency, formatDateRange } from '../utils/formatters'
 import { fadeSlideUp, staggerContainer } from '../utils/motionVariants'
-import { itineraryDays, tripDetail } from '../data/mockData'
+import { getTripById } from '../services/tripService'
 
 function TripDetails() {
-  const [isPublic, setIsPublic] = useState(tripDetail.isPublic)
+  const { id } = useParams()
+  const [tripDetail, setTripDetail] = useState(null)
+  const [itineraryDays, setItineraryDays] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const [isPublic, setIsPublic] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  useEffect(() => {
+    // In a real app, you would fetch itinerary along with the trip or separately.
+    // Assuming backend returns itinerary inside trip or we fetch it.
+    getTripById(id)
+      .then((res) => {
+        const trip = res.data.data.trip
+        setTripDetail(trip)
+        setIsPublic(trip.isShared || false)
+        // If itinerary is part of the response or we just mock it for now until we update the itinerary component
+        setItineraryDays(trip.itineraryDays || []) 
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [id])
+
   const totals = useMemo(() => {
-    const items = itineraryDays.flatMap((day) => day.items)
+    if (!tripDetail) return { days: 0, activities: 0, cost: 0 }
+    const items = itineraryDays.flatMap((day) => day.items || [])
     return {
       days: itineraryDays.length,
       activities: items.length,
-      cost: items.reduce((sum, item) => sum + item.cost, 0),
+      cost: items.reduce((sum, item) => sum + (item.cost || 0), 0),
     }
-  }, [])
+  }, [itineraryDays, tripDetail])
 
-  const remaining = tripDetail.budget.planned - tripDetail.budget.spent
-  const spentPercent = Math.round((tripDetail.budget.spent / tripDetail.budget.planned) * 100)
+  if (loading) return <div className="p-10 text-center text-white">Loading trip...</div>
+  if (error || !tripDetail) return <div className="p-10 text-center text-red-500">Error loading trip: {error}</div>
+
+  const planned = tripDetail.budget?.planned || 0
+  const spent = tripDetail.budget?.spent || 0
+  const remaining = planned - spent
+  const spentPercent = planned > 0 ? Math.round((spent / planned) * 100) : 0
 
   const handleCopyLink = () => {
     setCopied(true)
@@ -73,11 +101,11 @@ function TripDetails() {
               </span>
               <span className="flex items-center gap-1.5">
                 <MapPin className="size-4" />
-                {tripDetail.stops.map((s) => s.city).join(' • ')}
+                {tripDetail.stops?.map((s) => s.city?.name || s.city).join(' • ') || 'No stops yet'}
               </span>
               <span className="flex items-center gap-1.5">
                 <Users className="size-4" />
-                {tripDetail.travellers} travellers
+                {tripDetail.travellers || 1} travellers
               </span>
             </div>
           </motion.div>
@@ -122,7 +150,7 @@ function TripDetails() {
               <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
                 {[
                   ['Days', totals.days],
-                  ['Stops', tripDetail.stops.length],
+                  ['Stops', tripDetail.stops?.length || 0],
                   ['Plans', totals.activities],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-xl bg-surface-alt py-3">
@@ -140,7 +168,7 @@ function TripDetails() {
               </div>
 
               <p className="mt-3 font-display text-2xl font-semibold text-fg">
-                {formatCurrency(tripDetail.budget.planned)}
+                {formatCurrency(planned)}
               </p>
               <p className="text-xs text-muted">planned</p>
 
@@ -153,7 +181,7 @@ function TripDetails() {
 
               <div className="mt-3 flex items-center justify-between text-sm">
                 <span className="text-muted">
-                  Spent <span className="font-semibold text-fg">{formatCurrency(tripDetail.budget.spent)}</span>
+                  Spent <span className="font-semibold text-fg">{formatCurrency(spent)}</span>
                 </span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(remaining)} left
@@ -173,18 +201,18 @@ function TripDetails() {
             <Card className="p-5">
               <h3 className="font-display text-base font-semibold text-fg">Stops</h3>
               <ul className="mt-3 flex flex-col gap-2.5">
-                {tripDetail.stops.map((stop, i) => (
-                  <li key={stop.id} className="flex items-center gap-3">
+                {tripDetail.stops?.map((stop, i) => (
+                  <li key={stop.id || i} className="flex items-center gap-3">
                     <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-xs font-semibold text-brand-600 dark:text-brand-400">
                       {i + 1}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm text-fg">{stop.city}</span>
-                      <span className="block truncate text-xs text-muted">{stop.country}</span>
+                      <span className="block truncate text-sm text-fg">{stop.city?.name || stop.city}</span>
+                      <span className="block truncate text-xs text-muted">{stop.city?.country || stop.country}</span>
                     </span>
                     <span className="shrink-0 text-xs text-muted">{stop.nights}n</span>
                   </li>
-                ))}
+                )) || <li className="text-sm text-muted">No stops added.</li>}
               </ul>
             </Card>
 

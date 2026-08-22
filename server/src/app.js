@@ -8,6 +8,9 @@ const usersRoutes = require('./routes/users.routes');
 const citiesRoutes = require('./routes/cities.routes');
 const activitiesRoutes = require('./routes/activities.routes');
 const tripsRoutes = require('./routes/trips.routes');
+const communityRoutes = require('./routes/community.routes');
+const sharedTripsRoutes = require('./routes/sharedTrips.routes');
+const adminRoutes = require('./routes/admin.routes');
 const notFoundHandler = require('./middleware/notFoundHandler');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -23,6 +26,9 @@ app.use('/api/users', usersRoutes);
 app.use('/api/cities', citiesRoutes);
 app.use('/api/activities', activitiesRoutes);
 app.use('/api/trips', tripsRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/shared-trips', sharedTripsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Anything under /api that didn't match a route above.
 app.use('/api', notFoundHandler);

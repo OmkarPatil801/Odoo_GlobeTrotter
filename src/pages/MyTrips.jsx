@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { Luggage, Plus, Wallet, CalendarRange } from 'lucide-react'
 import PageContainer from '../components/ui/PageContainer'
@@ -11,11 +11,11 @@ import MyTripCard from '../components/trips/MyTripCard'
 import { formatCurrency } from '../utils/formatters'
 import { fadeSlideUp, staggerContainer } from '../utils/motionVariants'
 import {
-  myTrips,
   tripGroupByOptions,
   tripSortOptions,
   tripStatusTabs,
 } from '../data/mockData'
+import { getTrips } from '../services/tripService'
 import { cn } from '../utils/cn'
 
 function sortTrips(list, sortBy) {
@@ -48,6 +48,18 @@ function MyTrips() {
   const [status, setStatus] = useState('all')
   const [groupBy, setGroupBy] = useState('none')
   const [sortBy, setSortBy] = useState('date-desc')
+  const [myTrips, setMyTrips] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    getTrips()
+      .then((res) => {
+        setMyTrips(res.data.data.trips)
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
 
   const groups = useMemo(() => {
     const needle = query.trim().toLowerCase()

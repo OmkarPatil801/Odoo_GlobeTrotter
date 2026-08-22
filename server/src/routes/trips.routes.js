@@ -4,7 +4,21 @@ const createTripController = require('../controllers/tripController');
 const createTripService = require('../services/tripService');
 const createTripStopController = require('../controllers/tripStopController');
 const createTripStopService = require('../services/tripStopService');
-const { tripRepository, tripStopRepository, cityRepository } = require('../repositories');
+const createItineraryItemController = require('../controllers/itineraryItemController');
+const createItineraryItemService = require('../services/itineraryItemService');
+const createExpenseController = require('../controllers/expenseController');
+const createExpenseService = require('../services/expenseService');
+const createTripShareController = require('../controllers/tripShareController');
+const createTripShareService = require('../services/tripShareService');
+const {
+  tripRepository,
+  tripStopRepository,
+  cityRepository,
+  activityRepository,
+  itineraryItemRepository,
+  expenseRepository,
+  tripShareRepository,
+} = require('../repositories');
 const authenticate = require('../middleware/auth');
 const { validate } = require('../validators');
 const {
@@ -22,6 +36,21 @@ const {
   reorderStopsValidation,
   requireAtLeastOneStopField,
 } = require('../validators/tripStopValidators');
+const {
+  tripIdParamValidation: itineraryTripIdParamValidation,
+  itemIdParamValidation,
+  listItemsValidation,
+  createItemValidation,
+  updateItemValidation,
+  reorderItemsValidation,
+  requireAtLeastOneItemField,
+} = require('../validators/itineraryItemValidators');
+const {
+  tripIdParamValidation: expenseTripIdParamValidation,
+  expenseIdParamValidation,
+  listExpensesValidation,
+  createExpenseValidation,
+} = require('../validators/expenseValidators');
 
 // Default wiring for the running app — in-memory or Prisma repositories,
 // chosen once in src/repositories/index.js.
@@ -30,6 +59,25 @@ const tripController = createTripController(tripService);
 
 const tripStopService = createTripStopService({ tripRepository, tripStopRepository, cityRepository });
 const tripStopController = createTripStopController(tripStopService);
+
+const itineraryItemService = createItineraryItemService({
+  tripRepository,
+  itineraryItemRepository,
+  cityRepository,
+  activityRepository,
+});
+const itineraryItemController = createItineraryItemController(itineraryItemService);
+
+const expenseService = createExpenseService({ tripRepository, expenseRepository });
+const expenseController = createExpenseController(expenseService);
+
+const tripShareService = createTripShareService({
+  tripRepository,
+  tripStopRepository,
+  itineraryItemRepository,
+  tripShareRepository,
+});
+const tripShareController = createTripShareController(tripShareService);
 
 const router = express.Router();
 
@@ -78,6 +126,87 @@ router.delete(
   validate,
   tripStopController.remove
 );
+
+// Itinerary routes nested under a trip. Same ordering rule as stops:
+// the static "reorder" segment must be registered before ":itemId".
+router.get(
+  '/:tripId/itinerary',
+  authenticate,
+  itineraryTripIdParamValidation,
+  listItemsValidation,
+  validate,
+  itineraryItemController.list
+);
+router.post(
+  '/:tripId/itinerary',
+  authenticate,
+  itineraryTripIdParamValidation,
+  createItemValidation,
+  validate,
+  itineraryItemController.create
+);
+router.put(
+  '/:tripId/itinerary/reorder',
+  authenticate,
+  itineraryTripIdParamValidation,
+  reorderItemsValidation,
+  validate,
+  itineraryItemController.reorder
+);
+router.put(
+  '/:tripId/itinerary/:itemId',
+  authenticate,
+  itineraryTripIdParamValidation,
+  itemIdParamValidation,
+  requireAtLeastOneItemField,
+  updateItemValidation,
+  validate,
+  itineraryItemController.update
+);
+router.delete(
+  '/:tripId/itinerary/:itemId',
+  authenticate,
+  itineraryTripIdParamValidation,
+  itemIdParamValidation,
+  validate,
+  itineraryItemController.remove
+);
+
+// Expense/budget routes nested under a trip. "budget" is a static
+// segment registered ahead of no conflicting dynamic route here, but
+// kept alongside the other trip-scoped resources for consistency.
+router.get(
+  '/:tripId/expenses',
+  authenticate,
+  expenseTripIdParamValidation,
+  listExpensesValidation,
+  validate,
+  expenseController.list
+);
+router.post(
+  '/:tripId/expenses',
+  authenticate,
+  expenseTripIdParamValidation,
+  createExpenseValidation,
+  validate,
+  expenseController.create
+);
+router.delete(
+  '/:tripId/expenses/:expenseId',
+  authenticate,
+  expenseTripIdParamValidation,
+  expenseIdParamValidation,
+  validate,
+  expenseController.remove
+);
+router.get('/:tripId/budget', authenticate, expenseTripIdParamValidation, validate, expenseController.getBudget);
+
+// Sharing routes nested under a trip — creating/revoking a share
+// requires trip ownership (authenticated); the public read-only lookup
+// by token lives at GET /api/shared-trips/:shareToken (see
+// tripShares.routes.js), not here.
+router.post('/:tripId/share', authenticate, expenseTripIdParamValidation, validate, tripShareController.share);
+router.delete('/:tripId/share', authenticate, expenseTripIdParamValidation, validate, tripShareController.unshare);
 
 router.get('/:id', authenticate, tripIdParamValidation, validate, tripController.getById);
 router.put(

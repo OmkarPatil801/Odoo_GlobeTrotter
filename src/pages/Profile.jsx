@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { LogOut, MapPin, Pencil, Route, Save, X } from 'lucide-react'
@@ -11,7 +11,8 @@ import Dropdown from '../components/ui/Dropdown'
 import PageContainer from '../components/ui/PageContainer'
 import { cn } from '../utils/cn'
 import useAuth from '../hooks/useAuth'
-import { myTrips, profileCountryOptions, profileTravelPreferences } from '../data/mockData'
+import { profileCountryOptions, profileTravelPreferences } from '../data/mockData'
+import { getTrips } from '../services/tripService'
 
 function initialsOf(name = '') {
   return name
@@ -32,6 +33,15 @@ function Profile() {
     country: user?.country ?? '',
     preferences: user?.preferences ?? [],
   })
+  
+  const [tripsCount, setTripsCount] = useState(0)
+
+  useEffect(() => {
+    getTrips().then(res => {
+      const list = res.data.data.trips || res.data.data
+      setTripsCount(list.length)
+    }).catch(console.error)
+  }, [])
 
   function togglePreference(pref) {
     setForm((f) => ({
@@ -158,7 +168,7 @@ function Profile() {
               </span>
               <div>
                 <p className="text-xs uppercase tracking-wide text-muted">Trips planned</p>
-                <p className="font-display text-lg font-semibold text-fg">{myTrips.length}</p>
+                <p className="font-display text-lg font-semibold text-fg">{tripsCount}</p>
               </div>
             </div>
 

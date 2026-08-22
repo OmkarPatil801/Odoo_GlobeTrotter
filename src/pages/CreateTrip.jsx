@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { CalendarDays, CheckCircle2, Compass, Sparkles, Wallet } from 'lucide-react'
 import PageContainer from '../components/ui/PageContainer'
@@ -12,7 +12,9 @@ import DestinationSelect from '../components/DestinationSelect'
 import ActivityCard from '../components/ActivityCard'
 import { staggerContainer, fadeSlideUp } from '../utils/motionVariants'
 import { formatCurrency } from '../utils/formatters'
-import { suggestedActivities, tripDestinations } from '../data/mockData'
+import { getPopularCities } from '../services/cityService'
+import { getActivitiesByCity } from '../services/activityService'
+import { createTrip } from '../services/tripService'
 
 const emptyForm = {
   name: '',
@@ -38,6 +40,22 @@ function CreateTrip() {
   const [selectedActivityIds, setSelectedActivityIds] = useState([])
   const [errors, setErrors] = useState({})
   const [createdTrip, setCreatedTrip] = useState(null)
+  
+  const [tripDestinations, setTripDestinations] = useState([])
+  const [suggestedActivities, setSuggestedActivities] = useState([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    getPopularCities().then(res => setTripDestinations(res.data.data.cities || res.data.data))
+  }, [])
+
+  useEffect(() => {
+    if (form.destinationId) {
+      getActivitiesByCity(form.destinationId).then(res => setSuggestedActivities(res.data.data.activities || res.data.data))
+    } else {
+      setSuggestedActivities([])
+    }
+  }, [form.destinationId])
 
   const destination = tripDestinations.find((d) => d.id === form.destinationId)
 
@@ -60,21 +78,30 @@ function CreateTrip() {
     [selectedActivityIds],
   )
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     const nextErrors = validate(form)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
-    // Shape matches the tripService.createTrip payload for later backend wiring.
-    setCreatedTrip({
-      name: form.name.trim(),
-      startDate: form.startDate,
-      endDate: form.endDate,
-      destinationIds: [form.destinationId],
-      activityIds: selectedActivityIds,
-      estimatedBudget: activitiesTotal,
-    })
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        name: form.name.trim(),
+        startDate: form.startDate,
+        endDate: form.endDate,
+        destinationIds: [form.destinationId],
+        activityIds: selectedActivityIds,
+        estimatedBudget: activitiesTotal,
+      }
+      
+      const response = await createTrip(payload)
+      setCreatedTrip(response.data.data.trip || payload)
+    } catch (error) {
+      setErrors({ form: error.message || 'Failed to create trip.' })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const resetForm = () => {
@@ -252,9 +279,10 @@ function CreateTrip() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full sm:w-auto">
-              Create Trip
+            <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create Trip'}
             </Button>
+            {errors.form && <p className="text-red-500 mt-2">{errors.form}</p>}
           </Card>
         </form>
       </PageContainer>

@@ -17,6 +17,11 @@ let cityRepository;
 let activityRepository;
 let tripRepository;
 let tripStopRepository;
+let itineraryItemRepository;
+let expenseRepository;
+let savedDestinationRepository;
+let communityPostRepository;
+let tripShareRepository;
 
 if (env.useDatabase) {
   const createPrismaUserRepository = require('./prisma/userRepository.prisma');
@@ -24,24 +29,55 @@ if (env.useDatabase) {
   const createPrismaActivityRepository = require('./prisma/activityRepository.prisma');
   const createPrismaTripRepository = require('./prisma/tripRepository.prisma');
   const createPrismaTripStopRepository = require('./prisma/tripStopRepository.prisma');
+  const createPrismaItineraryItemRepository = require('./prisma/itineraryItemRepository.prisma');
+  const createPrismaExpenseRepository = require('./prisma/expenseRepository.prisma');
+  const createPrismaSavedDestinationRepository = require('./prisma/savedDestinationRepository.prisma');
+  const createPrismaCommunityPostRepository = require('./prisma/communityPostRepository.prisma');
+  const createPrismaTripShareRepository = require('./prisma/tripShareRepository.prisma');
 
   userRepository = createPrismaUserRepository();
   cityRepository = createPrismaCityRepository();
   activityRepository = createPrismaActivityRepository();
   tripRepository = createPrismaTripRepository();
   tripStopRepository = createPrismaTripStopRepository();
+  itineraryItemRepository = createPrismaItineraryItemRepository();
+  expenseRepository = createPrismaExpenseRepository();
+  savedDestinationRepository = createPrismaSavedDestinationRepository();
+  communityPostRepository = createPrismaCommunityPostRepository();
+  tripShareRepository = createPrismaTripShareRepository();
 } else {
   const createInMemoryUserRepository = require('./inMemoryUserRepository');
   const createInMemoryCityRepository = require('./inMemoryCityRepository');
   const createInMemoryActivityRepository = require('./inMemoryActivityRepository');
   const createInMemoryTripRepository = require('./inMemoryTripRepository');
   const createInMemoryTripStopRepository = require('./inMemoryTripStopRepository');
+  const createInMemoryItineraryItemRepository = require('./inMemoryItineraryItemRepository');
+  const createInMemoryExpenseRepository = require('./inMemoryExpenseRepository');
+  const createInMemorySavedDestinationRepository = require('./inMemorySavedDestinationRepository');
+  const createInMemoryCommunityPostRepository = require('./inMemoryCommunityPostRepository');
+  const createInMemoryTripShareRepository = require('./inMemoryTripShareRepository');
 
   userRepository = createInMemoryUserRepository();
   cityRepository = createInMemoryCityRepository();
   activityRepository = createInMemoryActivityRepository();
   tripRepository = createInMemoryTripRepository();
   tripStopRepository = createInMemoryTripStopRepository();
+  itineraryItemRepository = createInMemoryItineraryItemRepository();
+  expenseRepository = createInMemoryExpenseRepository();
+  savedDestinationRepository = createInMemorySavedDestinationRepository();
+  communityPostRepository = createInMemoryCommunityPostRepository();
+  tripShareRepository = createInMemoryTripShareRepository();
 }
 
-module.exports = { userRepository, cityRepository, activityRepository, tripRepository, tripStopRepository };
+module.exports = {
+  userRepository,
+  cityRepository,
+  activityRepository,
+  tripRepository,
+  tripStopRepository,
+  itineraryItemRepository,
+  expenseRepository,
+  savedDestinationRepository,
+  communityPostRepository,
+  tripShareRepository,
+};

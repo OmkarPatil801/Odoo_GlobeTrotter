@@ -1,10 +1,16 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import SectionHeading from '../ui/SectionHeading'
 import CityCard from './CityCard'
-import { cities } from '../../data/mockData'
+import { getPopularCities } from '../../services/cityService'
 import { staggerContainer } from '../../utils/motionVariants'
 
 export function DestinationsSection() {
+  const [cities, setCities] = useState([])
+  
+  useEffect(() => {
+    getPopularCities().then(res => setCities(res.data.data.cities || res.data.data)).catch(console.error)
+  }, [])
   return (
     <section>
       <SectionHeading

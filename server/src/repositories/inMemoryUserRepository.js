@@ -28,6 +28,10 @@ function createInMemoryUserRepository() {
       name,
       email,
       passwordHash,
+      role: 'USER',
+      country: null,
+      phone: null,
+      profileImageUrl: null,
       createdAt: new Date().toISOString(),
     };
     usersById.set(user.id, user);

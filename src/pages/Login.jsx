@@ -64,8 +64,8 @@ function Login() {
             <h1 className="mt-1 font-display text-2xl font-semibold text-fg">Log in</h1>
             <p className="mt-1 text-sm text-muted">
               Use{' '}
-              <span className="font-medium text-fg">demo@globetrotter.travel</span> /{' '}
-              <span className="font-medium text-fg">demo1234</span> to explore.
+              <span className="font-medium text-fg">demo@globetrotter.app</span> /{' '}
+              <span className="font-medium text-fg">Demo@123</span> to explore.
             </p>
 
             <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>

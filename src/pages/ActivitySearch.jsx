@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { ArrowRight, Search, Ticket, Wallet, X } from 'lucide-react'
 import PageContainer from '../components/ui/PageContainer'
@@ -14,16 +15,13 @@ import {
   activityCategoryOptions,
   activityDurationOptions,
   activitySortOptions,
-  searchableActivities,
-  searchableCities,
 } from '../data/mockData'
+import { searchActivities } from '../services/activityService'
+import { getPopularCities } from '../services/cityService'
 
 const durationBand = { short: [0, 2.99], half: [3, 5], full: [5.01, 99] }
 
-const cityOptions = [
-  { value: 'all', label: 'All cities' },
-  ...searchableCities.map((c) => ({ value: c.id, label: c.name })),
-]
+// Options populated dynamically below
 
 function ActivitySearch() {
   const [query, setQuery] = useState('')
@@ -32,6 +30,19 @@ function ActivitySearch() {
   const [duration, setDuration] = useState('all')
   const [sortBy, setSortBy] = useState('popular')
   const [addedIds, setAddedIds] = useState([])
+  
+  const [searchableActivities, setSearchableActivities] = useState([])
+  const [searchableCities, setSearchableCities] = useState([])
+
+  useEffect(() => {
+    getPopularCities().then(res => setSearchableCities(res.data.data.cities || res.data.data)).catch(console.error)
+    searchActivities('', '').then(res => setSearchableActivities(res.data.data.activities || res.data.data)).catch(console.error)
+  }, [])
+  
+  const cityOptions = useMemo(() => [
+    { value: 'all', label: 'All cities' },
+    ...searchableCities.map((c) => ({ value: c.id, label: c.name })),
+  ], [searchableCities])
 
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase()

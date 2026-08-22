@@ -18,10 +18,11 @@ function createUserService(userRepository) {
     return sanitizeUser(user);
   }
 
-  // `updates` is expected to already be limited to { name?, email? } by the
-  // controller — this never touches id/passwordHash regardless of what's
-  // in the raw request body.
-  async function updateProfile(userId, { name, email }) {
+  // `updates` is expected to already be limited to
+  // { name?, email?, country?, phone?, profileImageUrl? } by the
+  // controller — this never touches id/passwordHash/role regardless of
+  // what's in the raw request body.
+  async function updateProfile(userId, { name, email, country, phone, profileImageUrl }) {
     const existingUser = await userRepository.findUserById(userId);
     if (!existingUser) {
       throw new AppError('User not found', HTTP_STATUS.NOT_FOUND, 'USER_NOT_FOUND');
@@ -31,6 +32,18 @@ function createUserService(userRepository) {
 
     if (name !== undefined) {
       changes.name = name.trim();
+    }
+
+    if (country !== undefined) {
+      changes.country = country;
+    }
+
+    if (phone !== undefined) {
+      changes.phone = phone;
+    }
+
+    if (profileImageUrl !== undefined) {
+      changes.profileImageUrl = profileImageUrl;
     }
 
     if (email !== undefined) {

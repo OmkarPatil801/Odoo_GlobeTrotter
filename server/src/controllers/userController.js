@@ -17,11 +17,11 @@ function createUserController(userService) {
 
   async function updateMe(req, res, next) {
     try {
-      // Only ever read `name`/`email` off the body — this is what keeps
-      // id/passwordHash/anything else from being changed through this
-      // endpoint, regardless of what a client sends.
-      const { name, email } = req.body;
-      const user = await userService.updateProfile(req.user.id, { name, email });
+      // Only ever read these specific fields off the body — this is what
+      // keeps id/passwordHash/role/anything else from being changed
+      // through this endpoint, regardless of what a client sends.
+      const { name, email, country, phone, profileImageUrl } = req.body;
+      const user = await userService.updateProfile(req.user.id, { name, email, country, phone, profileImageUrl });
       return success(res, { user });
     } catch (err) {
       return next(err);

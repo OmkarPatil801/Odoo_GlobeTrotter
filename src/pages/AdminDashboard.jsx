@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
 import {
@@ -30,24 +31,18 @@ import {
   adminActivityMix,
   adminPopularDestinations,
   adminQuickActions,
-  adminRecentTrips,
-  adminRecentUsers,
   adminSignupTrend,
-  adminStats,
+  adminStats as fallbackStats,
+  adminRecentUsers as fallbackUsers,
+  adminRecentTrips as fallbackTrips,
 } from '../data/adminMockData'
+import api from '../services/api'
 import { cn } from '../utils/cn'
 
 const numberFmt = new Intl.NumberFormat('en-IN')
 
-const kpis = [
-  { label: 'Total users', value: numberFmt.format(adminStats.totalUsers), delta: adminStats.totalUsersDelta, icon: Users },
-  { label: 'Total trips', value: numberFmt.format(adminStats.totalTrips), delta: adminStats.totalTripsDelta, icon: Route },
-  { label: 'Active trips', value: numberFmt.format(adminStats.activeTrips), delta: adminStats.activeTripsDelta, icon: Plane },
-  { label: 'Revenue', value: formatCurrency(adminStats.revenue), delta: adminStats.revenueDelta, icon: Wallet },
-]
-
 const userStatusTone = { active: 'success', pending: 'warning', suspended: 'brand' }
-const tripStatusTone = { upcoming: 'brand', planning: 'warning', completed: 'success' }
+const tripStatusTone = { upcoming: 'brand', planning: 'warning', completed: 'success', planned: 'brand', ongoing: 'warning' }
 
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
@@ -64,6 +59,27 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 function AdminDashboard() {
+  const [adminStats, setAdminStats] = useState(fallbackStats)
+  const [adminRecentUsers, setAdminRecentUsers] = useState(fallbackUsers)
+  const [adminRecentTrips, setAdminRecentTrips] = useState(fallbackTrips)
+
+  useEffect(() => {
+    api.get('/admin/data')
+      .then(res => {
+        const { stats, recentUsers, recentTrips } = res.data.data
+        if (stats) setAdminStats(stats)
+        if (recentUsers) setAdminRecentUsers(recentUsers)
+        if (recentTrips) setAdminRecentTrips(recentTrips)
+      }).catch(console.error)
+  }, [])
+
+  const kpis = [
+    { label: 'Total users', value: numberFmt.format(adminStats.totalUsers), delta: adminStats.totalUsersDelta, icon: Users },
+    { label: 'Total trips', value: numberFmt.format(adminStats.totalTrips), delta: adminStats.totalTripsDelta, icon: Route },
+    { label: 'Active trips', value: numberFmt.format(adminStats.activeTrips), delta: adminStats.activeTripsDelta, icon: Plane },
+    { label: 'Revenue', value: formatCurrency(adminStats.revenue), delta: adminStats.revenueDelta, icon: Wallet },
+  ]
+
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">

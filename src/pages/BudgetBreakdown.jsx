@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import {
   Bar,
@@ -23,12 +24,12 @@ import { formatCurrency, formatDate } from '../utils/formatters'
 import { fadeSlideUp, staggerContainer, staggerItem } from '../utils/motionVariants'
 import {
   budgetCategories,
-  budgetDailySpend,
   budgetExpenseFilters,
-  budgetExpenses,
   budgetStatusFilters,
-  tripDetail,
 } from '../data/mockData'
+import { getBudget } from '../services/budgetService'
+import { getTripById } from '../services/tripService'
+import api from '../services/api'
 
 const categoryById = Object.fromEntries(budgetCategories.map((c) => [c.id, c]))
 
@@ -43,28 +44,45 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 function BudgetBreakdown() {
+  const { id } = useParams()
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('all')
+  const [trip, setTrip] = useState(null)
+  const [budgetData, setBudgetData] = useState(null)
+  const [expensesData, setExpensesData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      getTripById(id),
+      getBudget(id),
+      api.get(`/trips/${id}/expenses`)
+    ]).then(([tripRes, budgetRes, expensesRes]) => {
+      setTrip(tripRes.data.data.trip)
+      setBudgetData(budgetRes.data.data)
+      setExpensesData(expensesRes.data.data.expenses || expensesRes.data.data)
+    }).catch(console.error).finally(() => setLoading(false))
+  }, [id])
 
   const totals = useMemo(() => {
-    const planned = budgetCategories.reduce((s, c) => s + c.planned, 0)
-    const spent = budgetCategories.reduce((s, c) => s + c.spent, 0)
-    const days = budgetDailySpend.length
+    const planned = trip?.estimatedBudget || trip?.budget?.planned || budgetCategories.reduce((s, c) => s + c.planned, 0)
+    const spent = budgetData?.total || 0
+    const days = budgetData?.numberOfDays || 1
     return {
       planned,
       spent,
       remaining: planned - spent,
-      percent: Math.round((spent / planned) * 100),
-      perDay: Math.round(spent / days),
+      percent: planned > 0 ? Math.round((spent / planned) * 100) : 0,
+      perDay: budgetData?.averagePerDay || 0,
     }
-  }, [])
+  }, [trip, budgetData])
 
   const expenses = useMemo(() => {
-    let list = budgetExpenses
-    if (category !== 'all') list = list.filter((e) => e.categoryId === category)
+    let list = expensesData
+    if (category !== 'all') list = list.filter((e) => e.category === category)
     if (status !== 'all') list = list.filter((e) => (status === 'paid' ? e.paid : !e.paid))
-    return [...list].sort((a, b) => new Date(a.date) - new Date(b.date))
-  }, [category, status])
+    return [...list].sort((a, b) => new Date(a.expenseDate || a.date) - new Date(b.expenseDate || b.date))
+  }, [category, status, expensesData])
 
   const filteredTotal = expenses.reduce((s, e) => s + e.amount, 0)
 
@@ -85,11 +103,13 @@ function BudgetBreakdown() {
     },
   ]
 
+  if (loading) return <div className="p-10 text-center text-white">Loading budget...</div>
+
   return (
     <div className="pb-24">
       <PageContainer className="pt-10 sm:pt-14">
         <Button
-          to={`/trips/${tripDetail.id}`}
+          to={`/trips/${id}`}
           size="sm"
           variant="ghost"
           icon={ArrowLeft}
@@ -100,7 +120,7 @@ function BudgetBreakdown() {
 
         <motion.div initial="hidden" animate="visible" variants={fadeSlideUp}>
           <SectionHeading
-            eyebrow={tripDetail.name}
+            eyebrow={trip?.name || 'Trip'}
             title="Budget & Cost Breakdown"
             subtitle="Where the money is going, category by category."
           />
@@ -206,26 +226,8 @@ function BudgetBreakdown() {
           <div className="flex flex-col gap-5">
             <Card className="p-5 sm:p-6">
               <h3 className="font-display text-base font-semibold text-fg">Spend by day</h3>
-              <div className="mt-4 h-56">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={budgetDailySpend} margin={{ top: 4, right: 4, bottom: 0, left: -8 }}>
-                    <XAxis
-                      dataKey="label"
-                      tickLine={false}
-                      axisLine={false}
-                      tick={{ fontSize: 11, fill: 'var(--color-muted)' }}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      width={52}
-                      tick={{ fontSize: 11, fill: 'var(--color-muted)' }}
-                      tickFormatter={(v) => `₹${v / 1000}k`}
-                    />
-                    <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--color-surface-alt)' }} />
-                    <Bar dataKey="amount" radius={[6, 6, 0, 0]} fill="var(--color-brand-500)" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="mt-4 h-56 flex items-center justify-center text-muted">
+                (Chart data requires daily aggregation from backend)
               </div>
             </Card>
 
@@ -281,9 +283,9 @@ function BudgetBreakdown() {
                           style={{ background: cat.color }}
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-fg">{expense.title}</p>
+                          <p className="truncate text-sm font-medium text-fg">{expense.description || expense.title}</p>
                           <p className="mt-0.5 text-xs text-muted">
-                            {cat.name} · {expense.city} · {formatDate(expense.date)}
+                            {expense.category} · {formatDate(expense.expenseDate || expense.date)}
                           </p>
                         </div>
                         <Badge tone={expense.paid ? 'success' : 'warning'}>

@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import {
   ArrowLeft,
@@ -21,7 +22,9 @@ import Dropdown from '../components/ui/Dropdown'
 import EmptyState from '../components/ui/EmptyState'
 import { formatCurrency, formatDate } from '../utils/formatters'
 import { fadeSlideUp } from '../utils/motionVariants'
-import { calendarEventTypes, calendarEvents, tripDetail } from '../data/mockData'
+import { calendarEventTypes } from '../data/mockData'
+import { getItinerary } from '../services/itineraryService'
+import { getTripById } from '../services/tripService'
 import { cn } from '../utils/cn'
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -48,11 +51,40 @@ function buildMonthGrid(year, month) {
 }
 
 function TripCalendar() {
-  const tripStart = new Date(tripDetail.startDate)
-  const [cursor, setCursor] = useState(new Date(tripStart.getFullYear(), tripStart.getMonth(), 1))
+  const { id } = useParams()
+  const [tripDetail, setTripDetail] = useState(null)
+  const [calendarEvents, setCalendarEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const [cursor, setCursor] = useState(new Date())
   const [view, setView] = useState('month')
   const [typeFilter, setTypeFilter] = useState('all')
-  const [selectedKey, setSelectedKey] = useState(tripDetail.startDate)
+  const [selectedKey, setSelectedKey] = useState('')
+
+  useEffect(() => {
+    Promise.all([
+      getTripById(id),
+      getItinerary(id)
+    ]).then(([tripRes, itinRes]) => {
+      const trip = tripRes.data.data.trip
+      setTripDetail(trip)
+      
+      const tripStart = new Date(trip.startDate)
+      setCursor(new Date(tripStart.getFullYear(), tripStart.getMonth(), 1))
+      setSelectedKey(trip.startDate)
+      
+      const items = itinRes.data.data.itinerary || itinRes.data.data
+      setCalendarEvents(items.map(item => ({
+        id: item.id,
+        title: item.title,
+        date: item.startDate || item.date || trip.startDate,
+        time: item.time || '10:00',
+        type: item.type || 'activity',
+        city: item.city || trip.stops?.[0]?.city?.name || 'City',
+        cost: item.cost || item.budget || 0,
+      })))
+    }).catch(console.error).finally(() => setLoading(false))
+  }, [id])
 
   const events = useMemo(
     () => (typeFilter === 'all' ? calendarEvents : calendarEvents.filter((e) => e.type === typeFilter)),
@@ -90,11 +122,13 @@ function TripCalendar() {
 
   const totalCost = events.reduce((s, e) => s + e.cost, 0)
 
+  if (loading || !tripDetail) return <div className="p-10 text-center text-white">Loading calendar...</div>
+
   return (
     <div className="pb-24">
       <PageContainer className="pt-10 sm:pt-14">
         <Button
-          to={`/trips/${tripDetail.id}`}
+          to={`/trips/${id}`}
           size="sm"
           variant="ghost"
           icon={ArrowLeft}
@@ -135,7 +169,10 @@ function TripCalendar() {
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => setCursor(new Date(tripStart.getFullYear(), tripStart.getMonth(), 1))}
+              onClick={() => {
+                const tripStart = new Date(tripDetail.startDate)
+                setCursor(new Date(tripStart.getFullYear(), tripStart.getMonth(), 1))
+              }}
             >
               Trip month
             </Button>

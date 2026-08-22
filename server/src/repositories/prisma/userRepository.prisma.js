@@ -11,6 +11,10 @@ function toApiUser(row) {
     name: row.name,
     email: row.email,
     passwordHash: row.passwordHash,
+    role: row.role,
+    country: row.country,
+    phone: row.phone,
+    profileImageUrl: row.profileImageUrl,
     createdAt: row.createdAt.toISOString(),
   };
 }

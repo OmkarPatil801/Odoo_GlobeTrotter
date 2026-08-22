@@ -1,12 +1,18 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import SectionHeading from '../ui/SectionHeading'
 import EmptyState from '../ui/EmptyState'
 import TripCard from './TripCard'
-import { trips } from '../../data/mockData'
+import { getTrips } from '../../services/tripService'
 import { staggerContainer } from '../../utils/motionVariants'
 import { Luggage } from 'lucide-react'
 
 export function TripsSection() {
+  const [trips, setTrips] = useState([])
+  
+  useEffect(() => {
+    getTrips().then(res => setTrips(res.data.data.trips || res.data.data)).catch(console.error)
+  }, [])
   return (
     <section>
       <SectionHeading

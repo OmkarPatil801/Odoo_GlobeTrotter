@@ -4,8 +4,8 @@
 function sanitizeUser(user) {
   if (!user) return user;
 
-  const { id, name, email, createdAt } = user;
-  return { id, name, email, createdAt };
+  const { id, name, email, role, country, phone, profileImageUrl, createdAt } = user;
+  return { id, name, email, role, country, phone, profileImageUrl, createdAt };
 }
 
 module.exports = { sanitizeUser };

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import {
   Ban,
@@ -24,21 +24,31 @@ import {
   adminUserRoleOptions,
   adminUserSortOptions,
   adminUserStatusOptions,
-  adminUsers,
+  adminUsers as fallbackUsers,
 } from '../data/adminMockData'
+import api from '../services/api'
 import { cn } from '../utils/cn'
 
 const PAGE_SIZE = 8
 const statusTone = { active: 'success', pending: 'warning', suspended: 'brand' }
 
 function AdminUsers() {
-  const [users, setUsers] = useState(adminUsers)
+  const [users, setUsers] = useState(fallbackUsers)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('all')
   const [role, setRole] = useState('all')
   const [sortBy, setSortBy] = useState('recent')
   const [page, setPage] = useState(1)
   const [selectedId, setSelectedId] = useState(null)
+
+  useEffect(() => {
+    api.get('/admin/data')
+      .then(res => {
+        if (res.data.data.allUsers) {
+          setUsers(res.data.data.allUsers)
+        }
+      }).catch(console.error)
+  }, [])
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()

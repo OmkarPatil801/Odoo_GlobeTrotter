@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { Bookmark, Search, Share2, Sparkles, Users, X } from 'lucide-react'
 import PageContainer from '../components/ui/PageContainer'
@@ -12,11 +12,11 @@ import ItineraryPostCard from '../components/community/ItineraryPostCard'
 import { staggerContainer } from '../utils/motionVariants'
 import {
   communityDurationOptions,
-  communityItineraries,
   communitySortOptions,
   communityTagOptions,
   communityTopCreators,
 } from '../data/mockData'
+import api from '../services/api'
 import { cn } from '../utils/cn'
 
 const durationBand = { short: [0, 4], medium: [5, 8], long: [9, 99] }
@@ -28,6 +28,7 @@ const feedTabs = [
 ]
 
 function Community() {
+  const [communityItineraries, setCommunityItineraries] = useState([])
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState('all')
   const [tag, setTag] = useState('all')
@@ -35,6 +36,30 @@ function Community() {
   const [sortBy, setSortBy] = useState('popular')
   const [likedIds, setLikedIds] = useState([])
   const [savedIds, setSavedIds] = useState([])
+  
+  useEffect(() => {
+    api.get('/community/posts')
+      .then(res => {
+        const posts = res.data.data || []
+        const mappedPosts = posts.map(p => ({
+          id: p.id,
+          title: p.title || 'Untitled Itinerary',
+          author: p.author || 'Anonymous',
+          authorInitials: 'AN',
+          destinations: p.destinations || [],
+          days: p.days || 1,
+          budget: p.budget || 0,
+          likes: p.likes || 0,
+          saves: p.saves || 0,
+          comments: p.comments || 0,
+          tags: p.tags || [],
+          coverImage: p.imageUrl || null,
+          publishedAt: p.createdAt || new Date().toISOString()
+        }))
+        setCommunityItineraries(mappedPosts)
+      })
+      .catch(console.error)
+  }, [])
 
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase()

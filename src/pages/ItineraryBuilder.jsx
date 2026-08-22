@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { CalendarRange, Layers, Plus, Wallet } from 'lucide-react'
 import PageContainer from '../components/ui/PageContainer'
@@ -9,15 +10,31 @@ import ItinerarySectionCard from '../components/itinerary/ItinerarySectionCard'
 import SectionForm from '../components/itinerary/SectionForm'
 import { formatCurrency } from '../utils/formatters'
 import { fadeSlideUp } from '../utils/motionVariants'
-import { itinerarySections } from '../data/mockData'
+import { getItinerary } from '../services/itineraryService'
 
 const MS_PER_DAY = 86400000
 
 function ItineraryBuilder() {
-  const [sections, setSections] = useState(itinerarySections)
-  const [expandedIds, setExpandedIds] = useState([itinerarySections[0]?.id])
+  const { id } = useParams()
+  const [sections, setSections] = useState([])
+  const [expandedIds, setExpandedIds] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [adding, setAdding] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    getItinerary(id)
+      .then((res) => {
+        const items = res.data.data.itinerary || []
+        setSections(items)
+        if (items.length > 0) {
+          setExpandedIds([items[0].id])
+        }
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [id])
 
   const summary = useMemo(() => {
     const totalBudget = sections.reduce((sum, s) => sum + s.budget, 0)

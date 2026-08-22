@@ -4,4 +4,4 @@ export const searchCities = (query) => api.get('/cities/search', { params: { q: 
 
 export const getCityById = (cityId) => api.get(`/cities/${cityId}`)
 
-export const getPopularCities = () => api.get('/cities/popular')
+export const getPopularCities = () => api.get('/cities')
