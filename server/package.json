@@ -1,9 +1,13 @@
 {
-  "name": "globetrotter-database",
+  "name": "globetrotter-server",
   "version": "1.0.0",
-  "description": "GlobeTrotter travel planning application - database layer (Prisma + MySQL)",
+  "description": "GlobeTrotter server - Express API backend + Prisma/MySQL database layer",
   "private": true,
+  "main": "src/app.js",
   "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -15,14 +19,21 @@
   },
   "dependencies": {
     "@prisma/client": "^6.1.0",
-    "bcrypt": "^5.1.1",
-    "dotenv": "^16.4.7"
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
-    "prisma": "^6.1.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.10.2",
-    "@types/bcrypt": "^5.0.2"
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "prisma": "^6.1.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }
