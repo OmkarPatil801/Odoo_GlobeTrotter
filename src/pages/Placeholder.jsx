@@ -1,7 +1,7 @@
 function Placeholder({ title }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <h1 className="text-2xl font-semibold text-gray-700">{title}</h1>
+    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center">
+      <h1 className="font-display text-2xl font-semibold text-muted">{title}</h1>
     </div>
   )
 }

@@ -1,1 +1,95 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Theme-aware tokens — actual values swap in :root / .dark below. */
+  --color-surface: var(--gt-surface);
+  --color-surface-alt: var(--gt-surface-alt);
+  --color-card: var(--gt-card);
+  --color-fg: var(--gt-fg);
+  --color-muted: var(--gt-muted);
+  --color-line: var(--gt-line);
+  --color-primary: var(--gt-primary);
+  --color-primary-soft: var(--gt-primary-soft);
+
+  /* Fixed brand scale — coral accent, consistent across both themes. */
+  --color-brand-300: #ffa88f;
+  --color-brand-400: #ff8c6b;
+  --color-brand-500: #ff7a59;
+  --color-brand-600: #e85f3d;
+
+  --color-teal-400: #2fc4c5;
+  --color-teal-500: #19a7a8;
+  --color-teal-600: #128788;
+
+  --shadow-glow: 0 8px 24px -8px rgba(255, 122, 89, 0.5);
+  --shadow-card: 0 1px 2px rgba(23, 43, 58, 0.04), 0 12px 32px -16px rgba(23, 43, 58, 0.18);
+  --shadow-lift: 0 2px 4px rgba(23, 43, 58, 0.05), 0 24px 48px -20px rgba(23, 43, 58, 0.25);
+}
+
+:root {
+  --gt-surface: #f8faf9;
+  --gt-surface-alt: #eef3f2;
+  --gt-card: #ffffff;
+  --gt-fg: #172b3a;
+  --gt-muted: #5b7183;
+  --gt-line: #dfe7ea;
+  --gt-primary: #0b3d5c;
+  --gt-primary-soft: #e6eef3;
+}
+
+.dark {
+  --gt-surface: #0a1520;
+  --gt-surface-alt: #0f1e2c;
+  --gt-card: #12222f;
+  --gt-fg: #e9f0f4;
+  --gt-muted: #93a8b8;
+  --gt-line: #23394a;
+  --gt-primary: #0d2c3f;
+  --gt-primary-soft: #16303f;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-fg antialiased;
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    @apply bg-brand-500/25;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
