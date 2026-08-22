@@ -1,6 +1,7 @@
 const AppError = require('../utils/appError');
 const HTTP_STATUS = require('../utils/httpStatus');
 const { normalizePagination, buildPaginationMeta } = require('../utils/pagination');
+const { logSecurityEvent } = require('../utils/securityLogger');
 
 function tripNotFoundError() {
   // Also used when a trip exists but belongs to another user — the API
@@ -50,6 +51,10 @@ function createTripService(tripRepository) {
   async function getOwnedTrip(id, userId) {
     const trip = await tripRepository.findTripById(id);
     if (!trip || trip.userId !== userId) {
+      // Same log for "doesn't exist" and "exists but isn't yours" — the
+      // point of this event is to notice someone probing trip ids, not
+      // to distinguish the two cases (the API response already doesn't).
+      logSecurityEvent('AUTHORIZATION_FAILURE', { resource: 'trip', tripId: id, userId });
       throw tripNotFoundError();
     }
     return trip;

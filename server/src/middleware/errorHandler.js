@@ -1,11 +1,16 @@
 const env = require('../config/env');
 const AppError = require('../utils/appError');
 const { error: sendError, HTTP_STATUS } = require('../utils/apiResponse');
+const { logSecurityEvent } = require('../utils/securityLogger');
 
 // Centralized error handler. Every error in the app should end up here,
 // either via next(err) or a thrown error inside an async handler that's
 // been forwarded to next(). Always returns the standard error JSON shape
-// and never leaks a stack trace to the client.
+// and never leaks a stack trace, internal error message, or any other
+// implementation detail to the client — full detail is only ever logged
+// server-side (console.error below, and the structured security event
+// for the truly-unexpected branch), and that logging never includes the
+// request body (which is where a password could otherwise end up).
 function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
   // Full detail stays server-side only.
   console.error(`[error] ${req.method} ${req.originalUrl} ->`, err);
@@ -39,7 +44,22 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
     });
   }
 
-  // Unknown/unexpected error — respond generically, never expose internals.
+  // Request body exceeded env.jsonBodyLimit (see app.js).
+  if (err.type === 'entity.too.large') {
+    return sendError(res, {
+      statusCode: HTTP_STATUS.PAYLOAD_TOO_LARGE,
+      code: 'PAYLOAD_TOO_LARGE',
+      message: 'Request body is too large',
+    });
+  }
+
+  // CORS origin rejection (see src/middleware/cors.js) already arrives as
+  // an AppError and is handled above — nothing special needed here.
+
+  // Unknown/unexpected error — respond generically, never expose
+  // internals (stack trace, Prisma error text, file paths, etc.).
+  logSecurityEvent('UNEXPECTED_SERVER_ERROR', { method: req.method, path: req.originalUrl, name: err.name });
+
   return sendError(res, {
     statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR,
     code: 'INTERNAL_ERROR',

@@ -37,6 +37,10 @@ class AppError extends Error {
     return new AppError(message, HTTP_STATUS.UNPROCESSABLE_ENTITY, 'VALIDATION_ERROR', details);
   }
 
+  static tooManyRequests(message = 'Too many requests', details) {
+    return new AppError(message, HTTP_STATUS.TOO_MANY_REQUESTS, 'RATE_LIMIT_EXCEEDED', details);
+  }
+
   static internal(message = 'Internal server error', details) {
     return new AppError(message, HTTP_STATUS.INTERNAL_SERVER_ERROR, 'INTERNAL_ERROR', details);
   }

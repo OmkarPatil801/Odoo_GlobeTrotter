@@ -4,8 +4,14 @@ const AppError = require('../utils/appError');
 const HTTP_STATUS = require('../utils/httpStatus');
 const { signToken } = require('../utils/jwt');
 const { sanitizeUser } = require('../utils/sanitizeUser');
+const { logSecurityEvent } = require('../utils/securityLogger');
 
-const SALT_ROUNDS = 10;
+// OWASP currently recommends a bcrypt cost factor of at least 10-12 for
+// new hashes. 12 is a deliberate bump from a previous 10 — this is safe
+// and doesn't invalidate anything: bcrypt embeds the cost factor used in
+// the hash string itself, so bcrypt.compare() still verifies existing
+// (cost-10) hashes correctly; only newly created hashes use the new cost.
+const SALT_ROUNDS = 12;
 
 function normalizeEmail(email) {
   return email.trim().toLowerCase();
@@ -45,8 +51,15 @@ function createAuthService(userRepository) {
     const user = await userRepository.findUserByEmail(normalizedEmail);
 
     // Same generic error whether the email doesn't exist or the password
-    // is wrong — never reveal which one it was.
+    // is wrong — never reveal which one it was. The security log below is
+    // server-side only and never reaches the API response, so it's safe
+    // to note which case it was there without weakening the external
+    // anti-enumeration guarantee.
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+      logSecurityEvent('LOGIN_FAILURE', {
+        email: normalizedEmail,
+        reason: user ? 'invalid_password' : 'unknown_email',
+      });
       throw new AppError('Invalid email or password', HTTP_STATUS.UNAUTHORIZED, 'INVALID_CREDENTIALS');
     }
 

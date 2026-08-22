@@ -1,7 +1,9 @@
 const express = require('express');
-const cors = require('cors');
 
 const env = require('./config/env');
+const securityHeaders = require('./middleware/security');
+const corsMiddleware = require('./middleware/cors');
+const { generalLimiter } = require('./middleware/rateLimiter');
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
 const usersRoutes = require('./routes/users.routes');
@@ -13,8 +15,19 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(cors({ origin: env.corsOrigin }));
-app.use(express.json());
+// Trust the first proxy hop (load balancer/reverse proxy) so req.ip and
+// the rate limiter key off the real client IP, not the proxy's. Safe to
+// leave on in dev too — with no proxy in front, Express just uses the
+// direct connection IP as before.
+app.set('trust proxy', 1);
+
+app.use(securityHeaders);
+app.use(corsMiddleware);
+app.use(express.json({ limit: env.jsonBodyLimit }));
+
+// General API-wide rate limit — auth.routes.js additionally applies
+// stricter register/login-specific limits on top of this.
+app.use('/api', generalLimiter);
 
 // All application routes live under /api.
 app.use('/api/health', healthRoutes);

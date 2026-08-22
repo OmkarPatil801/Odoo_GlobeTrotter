@@ -1,5 +1,6 @@
 const AppError = require('../utils/appError');
 const HTTP_STATUS = require('../utils/httpStatus');
+const { logSecurityEvent } = require('../utils/securityLogger');
 
 function tripNotFoundError() {
   return new AppError('Trip not found', HTTP_STATUS.NOT_FOUND, 'TRIP_NOT_FOUND');
@@ -30,6 +31,7 @@ function createTripStopService({ tripRepository, tripStopRepository, cityReposit
   async function assertTripOwnership(tripId, userId) {
     const trip = await tripRepository.findTripById(tripId);
     if (!trip || trip.userId !== userId) {
+      logSecurityEvent('AUTHORIZATION_FAILURE', { resource: 'trip', tripId, userId });
       throw tripNotFoundError();
     }
     return trip;
@@ -47,6 +49,7 @@ function createTripStopService({ tripRepository, tripStopRepository, cityReposit
 
     const stop = await tripStopRepository.findStopById(stopId);
     if (!stop || stop.tripId !== tripId) {
+      logSecurityEvent('AUTHORIZATION_FAILURE', { resource: 'tripStop', tripId, stopId, userId });
       throw stopNotFoundError();
     }
     return stop;
