@@ -5,6 +5,10 @@ application. This directory documents the database; the schema itself lives in
 [`prisma/schema.prisma`](../prisma/schema.prisma) and is applied via Prisma
 migrations in [`prisma/migrations/`](../prisma/migrations/).
 
+This entire database/backend layer lives under `server/` (sibling to the
+frontend at the repo root, which has its own `package.json`). All commands
+below assume your working directory is `server/`, not the repo root.
+
 ```
 React (frontend)
   ↓ REST API
@@ -236,7 +240,7 @@ erDiagram
 
 ## 10. How your backend connects
 
-1. `npm install` (installs `@prisma/client`, `bcrypt`, etc. — already in `package.json` at the repo root)
+1. `npm install` inside `server/` (installs `@prisma/client`, `bcrypt`, etc. — already in `server/package.json`)
 2. Import the generated client: `import { PrismaClient } from '@prisma/client'`
 3. Use `DATABASE_URL` from `.env` (already wired via `prisma/schema.prisma`'s `datasource` block)
 4. Never query MySQL directly from Express — go through Prisma Client so schema changes stay centralized in `prisma/schema.prisma`
