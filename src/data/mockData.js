@@ -824,6 +824,28 @@ export const communitySortOptions = [
   { value: 'budget-low', label: 'Budget: low to high' },
 ]
 
+// ---- Profile (Step 22) ----
+
+export const profileCountryOptions = [
+  { value: 'India', label: 'India' },
+  { value: 'United States', label: 'United States' },
+  { value: 'United Kingdom', label: 'United Kingdom' },
+  { value: 'UAE', label: 'UAE' },
+  { value: 'Netherlands', label: 'Netherlands' },
+  { value: 'Türkiye', label: 'Türkiye' },
+]
+
+export const profileTravelPreferences = [
+  'Adventure',
+  'Culture',
+  'Food',
+  'Nature',
+  'Luxury',
+  'Budget',
+  'Beach',
+  'City',
+]
+
 export const communityTopCreators = [
   { id: 'cr-1', name: 'Meera Iyer', initials: 'MI', trips: 14, followers: '8.2k' },
   { id: 'cr-2', name: 'Kabir Menon', initials: 'KM', trips: 11, followers: '6.4k' },

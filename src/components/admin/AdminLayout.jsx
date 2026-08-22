@@ -1,14 +1,32 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { Bell, Menu, Search, X } from 'lucide-react'
+import { Bell, LogOut, Menu, Search, X } from 'lucide-react'
 import AdminSidebar from './AdminSidebar'
 import ThemeToggle from '../ui/ThemeToggle'
 import Input from '../ui/Input'
 import IconButton from '../ui/IconButton'
+import useAuth from '../../hooks/useAuth'
+
+function initialsOf(name = '') {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
 
 export function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    await logout()
+    navigate('/', { replace: true })
+  }
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -60,8 +78,9 @@ export function AdminLayout() {
             <ThemeToggle />
             <IconButton icon={Bell} label="Notifications" />
             <span className="flex size-9 items-center justify-center rounded-full bg-brand-500/15 text-xs font-semibold text-brand-600 dark:text-brand-400">
-              AD
+              {initialsOf(user?.name) || 'AD'}
             </span>
+            <IconButton icon={LogOut} label="Log out" onClick={handleLogout} />
           </div>
         </header>
 

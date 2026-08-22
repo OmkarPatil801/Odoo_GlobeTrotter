@@ -106,3 +106,117 @@ export const adminUserSortOptions = [
   { value: 'trips', label: 'Most trips' },
   { value: 'spend', label: 'Highest spend' },
 ]
+
+// ---- Admin Analytics (Step 18) ----
+
+export const adminAnalyticsRangeOptions = [
+  { value: '6m', label: 'Last 6 months' },
+  { value: '3m', label: 'Last 3 months' },
+  { value: '1m', label: 'Last 30 days' },
+]
+
+export const adminAnalyticsTrends = {
+  '6m': [
+    { month: 'Mar', users: 640, trips: 180, spend: 412000 },
+    { month: 'Apr', users: 780, trips: 224, spend: 498000 },
+    { month: 'May', users: 910, trips: 268, spend: 561000 },
+    { month: 'Jun', users: 1180, trips: 331, spend: 672000 },
+    { month: 'Jul', users: 1420, trips: 402, spend: 748000 },
+    { month: 'Aug', users: 1685, trips: 468, spend: 824000 },
+  ],
+  '3m': [
+    { month: 'Jun', users: 1180, trips: 331, spend: 672000 },
+    { month: 'Jul', users: 1420, trips: 402, spend: 748000 },
+    { month: 'Aug', users: 1685, trips: 468, spend: 824000 },
+  ],
+  '1m': [
+    { month: 'Wk 1', users: 380, trips: 104, spend: 198000 },
+    { month: 'Wk 2', users: 410, trips: 118, spend: 214000 },
+    { month: 'Wk 3', users: 445, trips: 126, spend: 231000 },
+    { month: 'Wk 4', users: 450, trips: 120, spend: 181000 },
+  ],
+}
+
+export const adminAnalyticsSummary = {
+  totalUsers: 12480,
+  totalUsersDelta: 8.4,
+  totalTrips: 3164,
+  totalTripsDelta: 12.1,
+  totalSpend: 51400000,
+  totalSpendDelta: 6.9,
+  avgTripBudget: 62800,
+  avgTripBudgetDelta: -1.4,
+}
+
+export const adminPopularActivities = [
+  { id: 'a-sightseeing', name: 'Sightseeing', bookings: 4820, color: '#ff7a59' },
+  { id: 'a-food', name: 'Food & Dining', bookings: 3410, color: '#19a7a8' },
+  { id: 'a-adventure', name: 'Adventure', bookings: 2560, color: '#0ea5e9' },
+  { id: 'a-culture', name: 'Culture & Heritage', bookings: 2130, color: '#f59e0b' },
+  { id: 'a-nature', name: 'Nature & Wildlife', bookings: 1280, color: '#8b5cf6' },
+]
+
+export const adminBudgetBreakdown = [
+  { name: 'Accommodation', value: 38, color: '#0ea5e9' },
+  { name: 'Transport', value: 26, color: '#19a7a8' },
+  { name: 'Activities', value: 20, color: '#ff7a59' },
+  { name: 'Food', value: 16, color: '#f59e0b' },
+]
+
+// ---- Admin Settings (Step 19) ----
+
+export const adminProfile = {
+  name: 'Tara Sethi',
+  email: 'tara.sethi@example.com',
+  role: 'Super Admin',
+  initials: 'TS',
+}
+
+export const adminSitePreferences = {
+  siteName: 'GlobeTrotter',
+  supportEmail: 'support@globetrotter.travel',
+  defaultCurrency: 'INR',
+  timezone: 'Asia/Kolkata',
+  language: 'en',
+}
+
+export const adminCurrencyOptions = [
+  { value: 'INR', label: 'INR — Indian Rupee' },
+  { value: 'USD', label: 'USD — US Dollar' },
+  { value: 'EUR', label: 'EUR — Euro' },
+  { value: 'GBP', label: 'GBP — British Pound' },
+]
+
+export const adminTimezoneOptions = [
+  { value: 'Asia/Kolkata', label: 'Asia/Kolkata (IST)' },
+  { value: 'Asia/Dubai', label: 'Asia/Dubai (GST)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT)' },
+  { value: 'America/New_York', label: 'America/New_York (EST)' },
+]
+
+export const adminLanguageOptions = [
+  { value: 'en', label: 'English' },
+  { value: 'hi', label: 'Hindi' },
+  { value: 'fr', label: 'French' },
+  { value: 'es', label: 'Spanish' },
+]
+
+export const adminNotificationPreferences = {
+  emailAlerts: true,
+  newUserSignups: true,
+  tripActivity: false,
+  weeklyDigest: true,
+  marketingEmails: false,
+}
+
+export const adminTravelSettings = {
+  defaultTripVisibility: 'private',
+  allowPublicItineraries: true,
+  autoApproveDestinations: false,
+  maintenanceMode: false,
+}
+
+export const adminTripVisibilityOptions = [
+  { value: 'private', label: 'Private by default' },
+  { value: 'public', label: 'Public by default' },
+]

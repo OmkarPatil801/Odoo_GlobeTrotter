@@ -1,7 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import AdminLayout from './components/admin/AdminLayout'
-import Placeholder from './pages/Placeholder'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -21,6 +21,8 @@ import AdminUsers from './pages/AdminUsers'
 import AdminTrips from './pages/AdminTrips'
 import AdminDestinations from './pages/AdminDestinations'
 import AdminActivities from './pages/AdminActivities'
+import AdminAnalytics from './pages/AdminAnalytics'
+import AdminSettings from './pages/AdminSettings'
 
 function App() {
   return (
@@ -30,27 +32,32 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/trips" element={<MyTrips />} />
-          <Route path="/trips/create" element={<CreateTrip />} />
-          <Route path="/trips/:id" element={<TripDetails />} />
-          <Route path="/trips/:id/itinerary" element={<ItineraryBuilder />} />
-          <Route path="/trips/:id/budget" element={<BudgetBreakdown />} />
-          <Route path="/trips/:id/calendar" element={<Calendar />} />
-          <Route path="/search/cities" element={<CitySearch />} />
-          <Route path="/search/activities" element={<ActivitySearch />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/profile" element={<Profile />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/trips" element={<MyTrips />} />
+            <Route path="/trips/create" element={<CreateTrip />} />
+            <Route path="/trips/:id" element={<TripDetails />} />
+            <Route path="/trips/:id/itinerary" element={<ItineraryBuilder />} />
+            <Route path="/trips/:id/budget" element={<BudgetBreakdown />} />
+            <Route path="/trips/:id/calendar" element={<Calendar />} />
+            <Route path="/search/cities" element={<CitySearch />} />
+            <Route path="/search/activities" element={<ActivitySearch />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="trips" element={<AdminTrips />} />
-          <Route path="destinations" element={<AdminDestinations />} />
-          <Route path="activities" element={<AdminActivities />} />
-          <Route path="analytics" element={<Placeholder title="Admin · Analytics" />} />
-          <Route path="settings" element={<Placeholder title="Admin · Settings" />} />
+        <Route element={<ProtectedRoute role="admin" />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="trips" element={<AdminTrips />} />
+            <Route path="destinations" element={<AdminDestinations />} />
+            <Route path="activities" element={<AdminActivities />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

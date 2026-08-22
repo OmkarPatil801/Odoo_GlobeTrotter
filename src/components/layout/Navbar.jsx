@@ -6,6 +6,7 @@ import { cn } from '../../utils/cn'
 import Button from '../ui/Button'
 import IconButton from '../ui/IconButton'
 import ThemeToggle from '../ui/ThemeToggle'
+import useAuth from '../../hooks/useAuth'
 
 const navLinks = [
   { label: 'Dashboard', to: '/dashboard' },
@@ -34,6 +35,7 @@ function NavItem({ to, label, onClick }) {
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
 
   return (
     <motion.header
@@ -52,18 +54,33 @@ export function Navbar() {
           </span>
         </NavLink>
 
-        <nav className="hidden items-center gap-7 lg:flex">
-          {navLinks.map((link) => (
-            <NavItem key={link.to} {...link} />
-          ))}
-        </nav>
+        {isAuthenticated && (
+          <nav className="hidden items-center gap-7 lg:flex">
+            {navLinks.map((link) => (
+              <NavItem key={link.to} {...link} />
+            ))}
+          </nav>
+        )}
 
         <div className="hidden items-center gap-2.5 lg:flex">
           <ThemeToggle />
-          <Button to="/trips/create" size="sm" icon={Plus}>
-            Plan a Trip
-          </Button>
-          <IconButton to="/profile" icon={User} label="Profile" />
+          {isAuthenticated ? (
+            <>
+              <Button to="/trips/create" size="sm" icon={Plus}>
+                Plan a Trip
+              </Button>
+              <IconButton to="/profile" icon={User} label="Profile" />
+            </>
+          ) : (
+            <>
+              <Button to="/login" variant="secondary" size="sm">
+                Log in
+              </Button>
+              <Button to="/register" size="sm">
+                Sign up
+              </Button>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
@@ -86,13 +103,26 @@ export function Navbar() {
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="flex flex-col gap-4 px-4 py-5 sm:px-6">
-              {navLinks.map((link) => (
-                <NavItem key={link.to} {...link} onClick={() => setMobileOpen(false)} />
-              ))}
-              <NavItem to="/profile" label="Profile" onClick={() => setMobileOpen(false)} />
-              <Button to="/trips/create" size="sm" icon={Plus} className="mt-1 w-full">
-                Plan a Trip
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  {navLinks.map((link) => (
+                    <NavItem key={link.to} {...link} onClick={() => setMobileOpen(false)} />
+                  ))}
+                  <NavItem to="/profile" label="Profile" onClick={() => setMobileOpen(false)} />
+                  <Button to="/trips/create" size="sm" icon={Plus} className="mt-1 w-full">
+                    Plan a Trip
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button to="/login" variant="secondary" size="sm" className="w-full" onClick={() => setMobileOpen(false)}>
+                    Log in
+                  </Button>
+                  <Button to="/register" size="sm" className="w-full" onClick={() => setMobileOpen(false)}>
+                    Sign up
+                  </Button>
+                </>
+              )}
             </div>
           </motion.div>
         )}
