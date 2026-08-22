@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
+import AdminLayout from './components/admin/AdminLayout'
+import Placeholder from './pages/Placeholder'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -15,6 +17,10 @@ import ActivitySearch from './pages/ActivitySearch'
 import Community from './pages/Community'
 import Profile from './pages/Profile'
 import AdminDashboard from './pages/AdminDashboard'
+import AdminUsers from './pages/AdminUsers'
+import AdminTrips from './pages/AdminTrips'
+import AdminDestinations from './pages/AdminDestinations'
+import AdminActivities from './pages/AdminActivities'
 
 function App() {
   return (
@@ -35,7 +41,16 @@ function App() {
           <Route path="/search/activities" element={<ActivitySearch />} />
           <Route path="/community" element={<Community />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="trips" element={<AdminTrips />} />
+          <Route path="destinations" element={<AdminDestinations />} />
+          <Route path="activities" element={<AdminActivities />} />
+          <Route path="analytics" element={<Placeholder title="Admin · Analytics" />} />
+          <Route path="settings" element={<Placeholder title="Admin · Settings" />} />
         </Route>
       </Routes>
     </BrowserRouter>
