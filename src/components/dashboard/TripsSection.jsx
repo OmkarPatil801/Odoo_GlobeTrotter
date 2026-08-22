@@ -4,14 +4,15 @@ import SectionHeading from '../ui/SectionHeading'
 import EmptyState from '../ui/EmptyState'
 import TripCard from './TripCard'
 import { getTrips } from '../../services/tripService'
+import { trips as seedTrips } from '../../data/mockData'
 import { staggerContainer } from '../../utils/motionVariants'
 import { Luggage } from 'lucide-react'
 
 export function TripsSection() {
-  const [trips, setTrips] = useState([])
+  const [trips, setTrips] = useState(seedTrips)
   
   useEffect(() => {
-    getTrips().then(res => setTrips(res.data.data.trips || res.data.data)).catch(console.error)
+    getTrips().then(res => setTrips(res.data.data.trips || res.data.data)).catch(() => {})
   }, [])
   return (
     <section>

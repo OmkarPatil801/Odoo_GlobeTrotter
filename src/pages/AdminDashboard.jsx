@@ -70,7 +70,9 @@ function AdminDashboard() {
         if (stats) setAdminStats(stats)
         if (recentUsers) setAdminRecentUsers(recentUsers)
         if (recentTrips) setAdminRecentTrips(recentTrips)
-      }).catch(console.error)
+      }).catch(() => {
+        /* Backend offline (demo mode) — keep the seeded dashboard figures. */
+      })
   }, [])
 
   const kpis = [

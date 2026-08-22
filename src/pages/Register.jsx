@@ -12,20 +12,41 @@ import { landingHeroImage } from '../data/mockData'
 function Register() {
   const { signup } = useAuth()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' })
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  function validate() {
+    if (form.name.trim().length < 2) return 'Please enter your full name.'
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return 'Please enter a valid email address.'
+    if (form.password.length < 6) return 'Password must be at least 6 characters.'
+    if (form.password !== form.confirm) return 'Passwords do not match.'
+    return ''
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setSuccess('')
+
+    const message = validate()
+    if (message) {
+      setError(message)
+      return
+    }
+
     setSubmitting(true)
     try {
-      await signup(form)
-      navigate('/dashboard', { replace: true })
+      const created = await signup({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      })
+      setSuccess(`Account created. Welcome aboard, ${created?.name?.split(' ')[0] || 'traveler'}!`)
+      setTimeout(() => navigate('/dashboard', { replace: true }), 650)
     } catch (err) {
       setError(err.message)
-    } finally {
       setSubmitting(false)
     }
   }
@@ -94,7 +115,27 @@ function Register() {
                 />
               </Field>
 
-              {error && <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>}
+              <Field label="Confirm password" htmlFor="register-confirm">
+                <Input
+                  id="register-confirm"
+                  type="password"
+                  required
+                  value={form.confirm}
+                  onChange={(e) => setForm((f) => ({ ...f, confirm: e.target.value }))}
+                  placeholder="Re-enter your password"
+                />
+              </Field>
+
+              {error && (
+                <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
+                  {error}
+                </p>
+              )}
+              {success && (
+                <p className="rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400">
+                  {success}
+                </p>
+              )}
 
               <Button type="submit" size="lg" icon={UserPlus} disabled={submitting} className="mt-2">
                 {submitting ? 'Creating account…' : 'Sign up'}
@@ -102,6 +143,16 @@ function Register() {
             </form>
 
             <p className="mt-6 text-center text-sm text-muted">
+              Are you an administrator?{' '}
+              <Link
+                to="/login"
+                state={{ mode: 'admin' }}
+                className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+              >
+                Admin login
+              </Link>
+            </p>
+            <p className="mt-2 text-center text-sm text-muted">
               Already have an account?{' '}
               <Link to="/login" className="font-medium text-brand-600 hover:text-brand-500 dark:text-brand-400">
                 Log in

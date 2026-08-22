@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { Compass, Menu, X, Plus, User } from 'lucide-react'
+import { Compass, Menu, X, Plus, User, ShieldCheck, LogOut } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import Button from '../ui/Button'
 import IconButton from '../ui/IconButton'
@@ -35,7 +35,14 @@ function NavItem({ to, label, onClick }) {
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    setMobileOpen(false)
+    await logout()
+    navigate('/', { replace: true })
+  }
 
   return (
     <motion.header
@@ -66,13 +73,31 @@ export function Navbar() {
           <ThemeToggle />
           {isAuthenticated ? (
             <>
+              {user?.role === 'admin' && (
+                <NavLink
+                  to="/admin"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
+                >
+                  <ShieldCheck className="size-3.5" />
+                  Admin
+                </NavLink>
+              )}
               <Button to="/trips/create" size="sm" icon={Plus}>
                 Plan a Trip
               </Button>
               <IconButton to="/profile" icon={User} label="Profile" />
+              <IconButton icon={LogOut} label="Log out" onClick={handleLogout} />
             </>
           ) : (
             <>
+              <NavLink
+                to="/login"
+                state={{ mode: 'admin' }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/40 px-3 py-1.5 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-500/10 dark:text-indigo-400"
+              >
+                <ShieldCheck className="size-3.5" />
+                Admin Login
+              </NavLink>
               <Button to="/login" variant="secondary" size="sm">
                 Log in
               </Button>
@@ -109,12 +134,19 @@ export function Navbar() {
                     <NavItem key={link.to} {...link} onClick={() => setMobileOpen(false)} />
                   ))}
                   <NavItem to="/profile" label="Profile" onClick={() => setMobileOpen(false)} />
+                  {user?.role === 'admin' && (
+                    <NavItem to="/admin" label="Admin Dashboard" onClick={() => setMobileOpen(false)} />
+                  )}
                   <Button to="/trips/create" size="sm" icon={Plus} className="mt-1 w-full">
                     Plan a Trip
+                  </Button>
+                  <Button variant="secondary" size="sm" icon={LogOut} className="w-full" onClick={handleLogout}>
+                    Log out
                   </Button>
                 </>
               ) : (
                 <>
+                  <NavItem to="/login" label="Admin Login" onClick={() => setMobileOpen(false)} />
                   <Button to="/login" variant="secondary" size="sm" className="w-full" onClick={() => setMobileOpen(false)}>
                     Log in
                   </Button>

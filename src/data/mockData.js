@@ -105,17 +105,33 @@ export const budgetSummary = {
   remaining: 32500,
 }
 
-// Marker layout for the hero globe — angles are stylized, not geographic.
+// Hero globe markers — real lat/lon so they sit on the rotating Earth.
+// `angle`/`ring` are kept for the flat marker layout fallback.
 export const globeDestinations = [
-  { id: 'globe-paris', name: 'Paris', angle: 20, ring: 1 },
-  { id: 'globe-dubai', name: 'Dubai', angle: 95, ring: 2 },
-  { id: 'globe-tokyo', name: 'Tokyo', angle: 165, ring: 1 },
-  { id: 'globe-new-york', name: 'New York', angle: 230, ring: 2 },
-  { id: 'globe-bali', name: 'Bali', angle: 285, ring: 1 },
-  { id: 'globe-london', name: 'London', angle: 335, ring: 2 },
+  { id: 'globe-paris', name: 'Paris', country: 'France', lat: 48.86, lon: 2.35, angle: 20, ring: 1 },
+  { id: 'globe-dubai', name: 'Dubai', country: 'UAE', lat: 25.2, lon: 55.27, angle: 95, ring: 2 },
+  { id: 'globe-tokyo', name: 'Tokyo', country: 'Japan', lat: 35.68, lon: 139.69, angle: 165, ring: 1 },
+  { id: 'globe-new-york', name: 'New York', country: 'USA', lat: 40.71, lon: -74.01, angle: 230, ring: 2 },
+  { id: 'globe-bali', name: 'Bali', country: 'Indonesia', lat: -8.41, lon: 115.19, angle: 285, ring: 1 },
+  { id: 'globe-london', name: 'London', country: 'United Kingdom', lat: 51.51, lon: -0.13, angle: 335, ring: 2 },
+  { id: 'globe-cape-town', name: 'Cape Town', country: 'South Africa', lat: -33.92, lon: 18.42, angle: 60, ring: 2 },
+  { id: 'globe-sydney', name: 'Sydney', country: 'Australia', lat: -33.87, lon: 151.21, angle: 200, ring: 2 },
+  { id: 'globe-rio', name: 'Rio de Janeiro', country: 'Brazil', lat: -22.91, lon: -43.17, angle: 260, ring: 1 },
+  { id: 'globe-goa', name: 'Goa', country: 'India', lat: 15.3, lon: 74.12, angle: 130, ring: 2 },
 ]
 
 export const globeRoute = ['globe-paris', 'globe-dubai', 'globe-tokyo']
+
+// Flight paths drawn as glowing arcs between markers.
+export const globeRoutes = [
+  ['globe-new-york', 'globe-london'],
+  ['globe-london', 'globe-dubai'],
+  ['globe-dubai', 'globe-goa'],
+  ['globe-goa', 'globe-bali'],
+  ['globe-bali', 'globe-sydney'],
+  ['globe-paris', 'globe-tokyo'],
+  ['globe-rio', 'globe-cape-town'],
+]
 
 // ---- Landing page (Screen 3) ----
 

@@ -11,6 +11,7 @@ import MyTripCard from '../components/trips/MyTripCard'
 import { formatCurrency } from '../utils/formatters'
 import { fadeSlideUp, staggerContainer } from '../utils/motionVariants'
 import {
+  myTrips as mockMyTrips,
   tripGroupByOptions,
   tripSortOptions,
   tripStatusTabs,
@@ -50,14 +51,13 @@ function MyTrips() {
   const [sortBy, setSortBy] = useState('date-desc')
   const [myTrips, setMyTrips] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     getTrips()
       .then((res) => {
         setMyTrips(res.data.data.trips)
       })
-      .catch((err) => setError(err.message))
+      .catch(() => setMyTrips(mockMyTrips))
       .finally(() => setLoading(false))
   }, [])
 
@@ -73,7 +73,7 @@ function MyTrips() {
     }
 
     return groupTrips(sortTrips(list, sortBy), groupBy)
-  }, [query, status, sortBy, groupBy])
+  }, [myTrips, query, status, sortBy, groupBy])
 
   const resultCount = groups.reduce((n, g) => n + g.items.length, 0)
 
@@ -85,7 +85,7 @@ function MyTrips() {
       { label: 'Upcoming', value: upcoming, icon: CalendarRange },
       { label: 'Total planned', value: formatCurrency(planned), icon: Wallet },
     ]
-  }, [])
+  }, [myTrips])
 
   return (
     <div className="pb-24">

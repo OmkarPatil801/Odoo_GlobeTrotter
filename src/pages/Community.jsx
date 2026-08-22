@@ -18,6 +18,7 @@ import {
 } from '../data/mockData'
 import api from '../services/api'
 import { cn } from '../utils/cn'
+import { communityItineraries as seedItineraries } from '../data/mockData'
 
 const durationBand = { short: [0, 4], medium: [5, 8], long: [9, 99] }
 
@@ -28,7 +29,7 @@ const feedTabs = [
 ]
 
 function Community() {
-  const [communityItineraries, setCommunityItineraries] = useState([])
+  const [communityItineraries, setCommunityItineraries] = useState(seedItineraries)
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState('all')
   const [tag, setTag] = useState('all')
@@ -58,7 +59,7 @@ function Community() {
         }))
         setCommunityItineraries(mappedPosts)
       })
-      .catch(console.error)
+      .catch(() => {})
   }, [])
 
   const results = useMemo(() => {

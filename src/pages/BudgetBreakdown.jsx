@@ -25,6 +25,8 @@ import { fadeSlideUp, staggerContainer, staggerItem } from '../utils/motionVaria
 import {
   budgetCategories,
   budgetExpenseFilters,
+  budgetDailySpend,
+  budgetExpenses,
   budgetStatusFilters,
 } from '../data/mockData'
 import { getBudget } from '../services/budgetService'
@@ -49,7 +51,7 @@ function BudgetBreakdown() {
   const [status, setStatus] = useState('all')
   const [trip, setTrip] = useState(null)
   const [budgetData, setBudgetData] = useState(null)
-  const [expensesData, setExpensesData] = useState([])
+  const [expensesData, setExpensesData] = useState(budgetExpenses)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -61,21 +63,29 @@ function BudgetBreakdown() {
       setTrip(tripRes.data.data.trip)
       setBudgetData(budgetRes.data.data)
       setExpensesData(expensesRes.data.data.expenses || expensesRes.data.data)
-    }).catch(console.error).finally(() => setLoading(false))
+    })
+      .catch(() => {
+        // Backend offline (demo mode) — keep the seeded budget figures.
+      })
+      .finally(() => setLoading(false))
   }, [id])
 
   const totals = useMemo(() => {
     const planned = trip?.estimatedBudget || trip?.budget?.planned || budgetCategories.reduce((s, c) => s + c.planned, 0)
-    const spent = budgetData?.total || 0
-    const days = budgetData?.numberOfDays || 1
+    // Without a live budget endpoint, derive the same figures from the
+    // expense list so the page never shows a row of zeros.
+    const spent =
+      budgetData?.total ??
+      expensesData.reduce((sum, e) => (e.paid ? sum + (e.amount || e.cost || 0) : sum), 0)
+    const days = budgetData?.numberOfDays || budgetDailySpend.length || 1
     return {
       planned,
       spent,
       remaining: planned - spent,
       percent: planned > 0 ? Math.round((spent / planned) * 100) : 0,
-      perDay: budgetData?.averagePerDay || 0,
+      perDay: budgetData?.averagePerDay ?? Math.round(spent / days),
     }
-  }, [trip, budgetData])
+  }, [trip, budgetData, expensesData])
 
   const expenses = useMemo(() => {
     let list = expensesData

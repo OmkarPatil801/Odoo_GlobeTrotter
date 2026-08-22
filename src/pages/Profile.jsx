@@ -13,6 +13,7 @@ import { cn } from '../utils/cn'
 import useAuth from '../hooks/useAuth'
 import { profileCountryOptions, profileTravelPreferences } from '../data/mockData'
 import { getTrips } from '../services/tripService'
+import { myTrips as seedTrips } from '../data/mockData'
 
 function initialsOf(name = '') {
   return name
@@ -34,13 +35,13 @@ function Profile() {
     preferences: user?.preferences ?? [],
   })
   
-  const [tripsCount, setTripsCount] = useState(0)
+  const [tripsCount, setTripsCount] = useState(seedTrips.length)
 
   useEffect(() => {
     getTrips().then(res => {
       const list = res.data.data.trips || res.data.data
       setTripsCount(list.length)
-    }).catch(console.error)
+    }).catch(() => {})
   }, [])
 
   function togglePreference(pref) {

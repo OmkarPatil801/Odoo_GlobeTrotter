@@ -24,6 +24,7 @@ import { formatCurrency, formatDate } from '../utils/formatters'
 import { fadeSlideUp } from '../utils/motionVariants'
 import { calendarEventTypes } from '../data/mockData'
 import { getItinerary } from '../services/itineraryService'
+import { calendarEvents as seedEvents, tripDetail as seedTripDetail } from '../data/mockData'
 import { getTripById } from '../services/tripService'
 import { cn } from '../utils/cn'
 
@@ -52,14 +53,17 @@ function buildMonthGrid(year, month) {
 
 function TripCalendar() {
   const { id } = useParams()
-  const [tripDetail, setTripDetail] = useState(null)
-  const [calendarEvents, setCalendarEvents] = useState([])
+  const [tripDetail, setTripDetail] = useState(seedTripDetail)
+  const [calendarEvents, setCalendarEvents] = useState(seedEvents)
   const [loading, setLoading] = useState(true)
 
-  const [cursor, setCursor] = useState(new Date())
+  const [cursor, setCursor] = useState(() => {
+    const start = new Date(seedTripDetail.startDate)
+    return new Date(start.getFullYear(), start.getMonth(), 1)
+  })
   const [view, setView] = useState('month')
   const [typeFilter, setTypeFilter] = useState('all')
-  const [selectedKey, setSelectedKey] = useState('')
+  const [selectedKey, setSelectedKey] = useState(seedTripDetail.startDate)
 
   useEffect(() => {
     Promise.all([
@@ -83,12 +87,16 @@ function TripCalendar() {
         city: item.city || trip.stops?.[0]?.city?.name || 'City',
         cost: item.cost || item.budget || 0,
       })))
-    }).catch(console.error).finally(() => setLoading(false))
+    })
+      .catch(() => {
+        // Backend offline (demo mode) — keep the seeded calendar.
+      })
+      .finally(() => setLoading(false))
   }, [id])
 
   const events = useMemo(
     () => (typeFilter === 'all' ? calendarEvents : calendarEvents.filter((e) => e.type === typeFilter)),
-    [typeFilter],
+    [calendarEvents, typeFilter],
   )
 
   const eventsByDate = useMemo(() => {

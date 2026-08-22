@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
-import { Compass } from 'lucide-react'
+import { Compass, Plus } from 'lucide-react'
+import Button from '../components/ui/Button'
 import PageContainer from '../components/ui/PageContainer'
 import SectionHeading from '../components/ui/SectionHeading'
 import EmptyState from '../components/ui/EmptyState'
@@ -9,6 +10,7 @@ import DestinationCard from '../components/DestinationCard'
 import PreviousTripCard from '../components/PreviousTripCard'
 import LandingHero from '../components/landing/LandingHero'
 import PlanTripCTA from '../components/landing/PlanTripCTA'
+import TravelGlobe from '../components/TravelGlobe'
 import { staggerContainer } from '../utils/motionVariants'
 import {
   destinationFilterOptions,
@@ -87,6 +89,30 @@ function Landing() {
       </LandingHero>
 
       <PageContainer className="flex flex-col gap-16 pt-16 sm:gap-20">
+        <section className="grid items-center gap-10 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400">
+              Live destination map
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold leading-tight text-fg sm:text-4xl">
+              Explore destinations around the world.
+            </h2>
+            <p className="mt-4 max-w-md text-base text-muted">
+              Spin the globe, tap a glowing marker, and follow the flight paths connecting the
+              cities GlobeTrotter travelers are booking right now.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button to="/trips/create" size="lg" icon={Plus}>
+                Start planning
+              </Button>
+              <Button to="/search/cities" size="lg" variant="outline">
+                Browse destinations
+              </Button>
+            </div>
+          </div>
+          <TravelGlobe className="mx-auto w-full max-w-md lg:max-w-none" />
+        </section>
+
         <section>
           <SectionHeading
             eyebrow="Handpicked for you"

@@ -3,13 +3,14 @@ import { motion } from 'motion/react'
 import SectionHeading from '../ui/SectionHeading'
 import CityCard from './CityCard'
 import { getPopularCities } from '../../services/cityService'
+import { cities as seedCities } from '../../data/mockData'
 import { staggerContainer } from '../../utils/motionVariants'
 
 export function DestinationsSection() {
-  const [cities, setCities] = useState([])
+  const [cities, setCities] = useState(seedCities)
   
   useEffect(() => {
-    getPopularCities().then(res => setCities(res.data.data.cities || res.data.data)).catch(console.error)
+    getPopularCities().then(res => setCities(res.data.data.cities || res.data.data)).catch(() => {})
   }, [])
   return (
     <section>

@@ -11,6 +11,7 @@ import SectionForm from '../components/itinerary/SectionForm'
 import { formatCurrency } from '../utils/formatters'
 import { fadeSlideUp } from '../utils/motionVariants'
 import { getItinerary } from '../services/itineraryService'
+import { itinerarySections as mockItinerarySections } from '../data/mockData'
 
 const MS_PER_DAY = 86400000
 
@@ -21,7 +22,6 @@ function ItineraryBuilder() {
   const [editingId, setEditingId] = useState(null)
   const [adding, setAdding] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
 
   useEffect(() => {
     getItinerary(id)
@@ -32,7 +32,10 @@ function ItineraryBuilder() {
           setExpandedIds([items[0].id])
         }
       })
-      .catch((err) => setError(err.message))
+      .catch(() => {
+        setSections(mockItinerarySections)
+        if (mockItinerarySections.length > 0) setExpandedIds([mockItinerarySections[0].id])
+      })
       .finally(() => setLoading(false))
   }, [id])
 

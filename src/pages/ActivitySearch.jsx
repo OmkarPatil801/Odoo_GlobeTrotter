@@ -18,6 +18,7 @@ import {
 } from '../data/mockData'
 import { searchActivities } from '../services/activityService'
 import { getPopularCities } from '../services/cityService'
+import { searchableActivities as seedActivities, searchableCities as seedCities } from '../data/mockData'
 
 const durationBand = { short: [0, 2.99], half: [3, 5], full: [5.01, 99] }
 
@@ -31,12 +32,12 @@ function ActivitySearch() {
   const [sortBy, setSortBy] = useState('popular')
   const [addedIds, setAddedIds] = useState([])
   
-  const [searchableActivities, setSearchableActivities] = useState([])
-  const [searchableCities, setSearchableCities] = useState([])
+  const [searchableActivities, setSearchableActivities] = useState(seedActivities)
+  const [searchableCities, setSearchableCities] = useState(seedCities)
 
   useEffect(() => {
-    getPopularCities().then(res => setSearchableCities(res.data.data.cities || res.data.data)).catch(console.error)
-    searchActivities('', '').then(res => setSearchableActivities(res.data.data.activities || res.data.data)).catch(console.error)
+    getPopularCities().then(res => setSearchableCities(res.data.data.cities || res.data.data)).catch(() => {})
+    searchActivities('', '').then(res => setSearchableActivities(res.data.data.activities || res.data.data)).catch(() => {})
   }, [])
   
   const cityOptions = useMemo(() => [

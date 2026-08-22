@@ -47,7 +47,7 @@ function AdminUsers() {
         if (res.data.data.allUsers) {
           setUsers(res.data.data.allUsers)
         }
-      }).catch(console.error)
+      }).catch(() => {})
   }, [])
 
   const filtered = useMemo(() => {
