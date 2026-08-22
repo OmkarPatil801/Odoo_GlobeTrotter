@@ -13,11 +13,16 @@ async function hash(password: string) {
 type CitySeed = {
   name: string;
   country: string;
+  countryCode: string;
   region: string;
   description: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
   costIndex: number;
   popularityScore: number;
   imageUrl: string;
+  currencyCode: string;
   activities: {
     name: string;
     category: string;
@@ -32,11 +37,16 @@ const cities: CitySeed[] = [
   {
     name: "Paris",
     country: "France",
+    countryCode: "FR",
     region: "Europe",
     description: "The City of Light, famed for art, fashion and cuisine.",
+    latitude: 48.856613,
+    longitude: 2.352222,
+    timezone: "Europe/Paris",
     costIndex: 85,
     popularityScore: 98,
     imageUrl: "https://images.example.com/cities/paris.jpg",
+    currencyCode: "EUR",
     activities: [
       { name: "Eiffel Tower Visit", category: "Sightseeing", description: "Iconic iron tower with city views.", durationHours: 2, cost: 30, imageUrl: "https://images.example.com/activities/eiffel-tower.jpg" },
       { name: "Louvre Museum", category: "Museum", description: "World's largest art museum, home to the Mona Lisa.", durationHours: 3, cost: 22, imageUrl: "https://images.example.com/activities/louvre.jpg" },
@@ -47,11 +57,16 @@ const cities: CitySeed[] = [
   {
     name: "London",
     country: "United Kingdom",
+    countryCode: "GB",
     region: "Europe",
     description: "Historic capital blending royal heritage and modern culture.",
+    latitude: 51.507351,
+    longitude: -0.127758,
+    timezone: "Europe/London",
     costIndex: 90,
     popularityScore: 95,
     imageUrl: "https://images.example.com/cities/london.jpg",
+    currencyCode: "GBP",
     activities: [
       { name: "Big Ben & Westminster", category: "Sightseeing", description: "Iconic clock tower and Houses of Parliament.", durationHours: 1.5, cost: 0, imageUrl: "https://images.example.com/activities/big-ben.jpg" },
       { name: "British Museum", category: "Museum", description: "World history and culture under one roof.", durationHours: 3, cost: 0, imageUrl: "https://images.example.com/activities/british-museum.jpg" },
@@ -62,11 +77,16 @@ const cities: CitySeed[] = [
   {
     name: "Amsterdam",
     country: "Netherlands",
+    countryCode: "NL",
     region: "Europe",
     description: "Canal city known for art, cycling and nightlife.",
+    latitude: 52.367573,
+    longitude: 4.904139,
+    timezone: "Europe/Amsterdam",
     costIndex: 80,
     popularityScore: 88,
     imageUrl: "https://images.example.com/cities/amsterdam.jpg",
+    currencyCode: "EUR",
     activities: [
       { name: "Canal Cruise", category: "Sightseeing", description: "Tour the historic canal ring by boat.", durationHours: 1, cost: 20, imageUrl: "https://images.example.com/activities/canal-cruise.jpg" },
       { name: "Van Gogh Museum", category: "Museum", description: "Largest collection of Van Gogh's work.", durationHours: 2, cost: 20, imageUrl: "https://images.example.com/activities/van-gogh.jpg" },
@@ -76,11 +96,16 @@ const cities: CitySeed[] = [
   {
     name: "Dubai",
     country: "United Arab Emirates",
+    countryCode: "AE",
     region: "Middle East",
     description: "Futuristic skyline, desert adventures and luxury shopping.",
+    latitude: 25.204849,
+    longitude: 55.270782,
+    timezone: "Asia/Dubai",
     costIndex: 88,
     popularityScore: 90,
     imageUrl: "https://images.example.com/cities/dubai.jpg",
+    currencyCode: "AED",
     activities: [
       { name: "Burj Khalifa Observation Deck", category: "Sightseeing", description: "Views from the world's tallest building.", durationHours: 1.5, cost: 45, imageUrl: "https://images.example.com/activities/burj-khalifa.jpg" },
       { name: "Desert Safari", category: "Adventure", description: "Dune bashing, camel rides and BBQ dinner.", durationHours: 5, cost: 60, imageUrl: "https://images.example.com/activities/desert-safari.jpg" },
@@ -90,11 +115,16 @@ const cities: CitySeed[] = [
   {
     name: "Tokyo",
     country: "Japan",
+    countryCode: "JP",
     region: "Asia",
     description: "Ultra-modern metropolis with deep traditional roots.",
+    latitude: 35.689487,
+    longitude: 139.691711,
+    timezone: "Asia/Tokyo",
     costIndex: 82,
     popularityScore: 93,
     imageUrl: "https://images.example.com/cities/tokyo.jpg",
+    currencyCode: "JPY",
     activities: [
       { name: "Senso-ji Temple", category: "Sightseeing", description: "Tokyo's oldest Buddhist temple.", durationHours: 1.5, cost: 0, imageUrl: "https://images.example.com/activities/sensoji.jpg" },
       { name: "Shibuya Crossing & Shopping", category: "Shopping", description: "World's busiest pedestrian crossing.", durationHours: 2, cost: 0, imageUrl: "https://images.example.com/activities/shibuya.jpg" },
@@ -105,11 +135,16 @@ const cities: CitySeed[] = [
   {
     name: "Mumbai",
     country: "India",
+    countryCode: "IN",
     region: "Asia",
     description: "India's financial capital, vibrant and fast-paced.",
+    latitude: 19.075983,
+    longitude: 72.877655,
+    timezone: "Asia/Kolkata",
     costIndex: 45,
     popularityScore: 78,
     imageUrl: "https://images.example.com/cities/mumbai.jpg",
+    currencyCode: "INR",
     activities: [
       { name: "Gateway of India", category: "Sightseeing", description: "Iconic colonial-era monument by the sea.", durationHours: 1, cost: 0, imageUrl: "https://images.example.com/activities/gateway-of-india.jpg" },
       { name: "Elephanta Caves Ferry", category: "Tour", description: "Ancient rock-cut caves on Elephanta Island.", durationHours: 4, cost: 15, imageUrl: "https://images.example.com/activities/elephanta.jpg" },
@@ -119,11 +154,16 @@ const cities: CitySeed[] = [
   {
     name: "Goa",
     country: "India",
+    countryCode: "IN",
     region: "Asia",
     description: "Coastal paradise known for beaches and nightlife.",
+    latitude: 15.299326,
+    longitude: 74.123993,
+    timezone: "Asia/Kolkata",
     costIndex: 35,
     popularityScore: 85,
     imageUrl: "https://images.example.com/cities/goa.jpg",
+    currencyCode: "INR",
     activities: [
       { name: "Baga Beach", category: "Beach", description: "Popular beach with water sports and shacks.", durationHours: 3, cost: 0, imageUrl: "https://images.example.com/activities/baga-beach.jpg" },
       { name: "Fort Aguada", category: "Sightseeing", description: "17th-century Portuguese fort with lighthouse.", durationHours: 1.5, cost: 5, imageUrl: "https://images.example.com/activities/fort-aguada.jpg" },
@@ -133,11 +173,16 @@ const cities: CitySeed[] = [
   {
     name: "Delhi",
     country: "India",
+    countryCode: "IN",
     region: "Asia",
     description: "India's capital, rich in Mughal and colonial history.",
+    latitude: 28.613939,
+    longitude: 77.209023,
+    timezone: "Asia/Kolkata",
     costIndex: 40,
     popularityScore: 80,
     imageUrl: "https://images.example.com/cities/delhi.jpg",
+    currencyCode: "INR",
     activities: [
       { name: "Red Fort", category: "Sightseeing", description: "Historic Mughal fortress complex.", durationHours: 2, cost: 6, imageUrl: "https://images.example.com/activities/red-fort.jpg" },
       { name: "India Gate", category: "Sightseeing", description: "War memorial and popular gathering spot.", durationHours: 1, cost: 0, imageUrl: "https://images.example.com/activities/india-gate.jpg" },
@@ -147,11 +192,16 @@ const cities: CitySeed[] = [
   {
     name: "Singapore",
     country: "Singapore",
+    countryCode: "SG",
     region: "Asia",
     description: "Compact city-state famed for food and futuristic gardens.",
+    latitude: 1.352083,
+    longitude: 103.819839,
+    timezone: "Asia/Singapore",
     costIndex: 87,
     popularityScore: 89,
     imageUrl: "https://images.example.com/cities/singapore.jpg",
+    currencyCode: "SGD",
     activities: [
       { name: "Gardens by the Bay", category: "Sightseeing", description: "Futuristic Supertree gardens and domes.", durationHours: 2.5, cost: 28, imageUrl: "https://images.example.com/activities/gardens-by-the-bay.jpg" },
       { name: "Sentosa Island", category: "Adventure", description: "Beaches, theme parks and attractions.", durationHours: 4, cost: 40, imageUrl: "https://images.example.com/activities/sentosa.jpg" },
@@ -161,11 +211,16 @@ const cities: CitySeed[] = [
   {
     name: "Bali",
     country: "Indonesia",
+    countryCode: "ID",
     region: "Asia",
     description: "Tropical island of temples, rice terraces and surf.",
+    latitude: -8.340539,
+    longitude: 115.091949,
+    timezone: "Asia/Makassar",
     costIndex: 42,
     popularityScore: 91,
     imageUrl: "https://images.example.com/cities/bali.jpg",
+    currencyCode: "IDR",
     activities: [
       { name: "Tanah Lot Temple", category: "Sightseeing", description: "Iconic sea temple on a rock formation.", durationHours: 1.5, cost: 10, imageUrl: "https://images.example.com/activities/tanah-lot.jpg" },
       { name: "Ubud Rice Terraces", category: "Nature", description: "Scenic terraced rice paddies.", durationHours: 2, cost: 5, imageUrl: "https://images.example.com/activities/ubud-terraces.jpg" },
@@ -175,11 +230,16 @@ const cities: CitySeed[] = [
   {
     name: "New York",
     country: "United States",
+    countryCode: "US",
     region: "North America",
     description: "The city that never sleeps, a global hub of culture.",
+    latitude: 40.712776,
+    longitude: -74.005974,
+    timezone: "America/New_York",
     costIndex: 95,
     popularityScore: 96,
     imageUrl: "https://images.example.com/cities/new-york.jpg",
+    currencyCode: "USD",
     activities: [
       { name: "Statue of Liberty & Ellis Island", category: "Sightseeing", description: "Ferry tour to America's iconic statue.", durationHours: 3, cost: 24, imageUrl: "https://images.example.com/activities/statue-of-liberty.jpg" },
       { name: "Central Park Walk", category: "Nature", description: "Iconic urban park in the heart of Manhattan.", durationHours: 2, cost: 0, imageUrl: "https://images.example.com/activities/central-park.jpg" },
@@ -190,11 +250,16 @@ const cities: CitySeed[] = [
   {
     name: "Rome",
     country: "Italy",
+    countryCode: "IT",
     region: "Europe",
     description: "The Eternal City, cradle of the Roman Empire.",
+    latitude: 41.902782,
+    longitude: 12.496366,
+    timezone: "Europe/Rome",
     costIndex: 78,
     popularityScore: 94,
     imageUrl: "https://images.example.com/cities/rome.jpg",
+    currencyCode: "EUR",
     activities: [
       { name: "Colosseum Tour", category: "Sightseeing", description: "Ancient Roman amphitheatre.", durationHours: 2, cost: 24, imageUrl: "https://images.example.com/activities/colosseum.jpg" },
       { name: "Vatican Museums & Sistine Chapel", category: "Museum", description: "Renaissance art and Michelangelo's masterpiece.", durationHours: 3, cost: 30, imageUrl: "https://images.example.com/activities/vatican.jpg" },
@@ -246,8 +311,12 @@ async function main() {
         data: {
           name: c.name,
           country: c.country,
+          countryCode: c.countryCode,
           region: c.region,
           description: c.description,
+          latitude: c.latitude,
+          longitude: c.longitude,
+          timezone: c.timezone,
           costIndex: c.costIndex,
           popularityScore: c.popularityScore,
           imageUrl: c.imageUrl,
@@ -269,6 +338,7 @@ async function main() {
             description: a.description,
             durationHours: a.durationHours,
             cost: a.cost,
+            currencyCode: c.currencyCode,
             imageUrl: a.imageUrl,
           },
         }));
@@ -354,11 +424,11 @@ async function main() {
   }
 
   // Expenses
-  const expenseData: { category: ExpenseCategory; amount: number; description: string; expenseDate: Date }[] = [
-    { category: ExpenseCategory.TRANSPORT, amount: 10000, description: "Flights and Eurostar tickets", expenseDate: new Date("2026-09-12") },
-    { category: ExpenseCategory.STAY, amount: 25000, description: "Hotels in Paris, London, Amsterdam", expenseDate: new Date("2026-09-12") },
-    { category: ExpenseCategory.ACTIVITY, amount: 8000, description: "Museum and attraction tickets", expenseDate: new Date("2026-09-13") },
-    { category: ExpenseCategory.MEAL, amount: 5000, description: "Meals across all three cities", expenseDate: new Date("2026-09-14") },
+  const expenseData: { category: ExpenseCategory; amount: number; currencyCode: string; description: string; expenseDate: Date }[] = [
+    { category: ExpenseCategory.TRANSPORT, amount: 10000, currencyCode: "INR", description: "Flights and Eurostar tickets", expenseDate: new Date("2026-09-12") },
+    { category: ExpenseCategory.STAY, amount: 25000, currencyCode: "INR", description: "Hotels in Paris, London, Amsterdam", expenseDate: new Date("2026-09-12") },
+    { category: ExpenseCategory.ACTIVITY, amount: 8000, currencyCode: "INR", description: "Museum and attraction tickets", expenseDate: new Date("2026-09-13") },
+    { category: ExpenseCategory.MEAL, amount: 5000, currencyCode: "INR", description: "Meals across all three cities", expenseDate: new Date("2026-09-14") },
   ];
 
   const existingExpenses = await prisma.expense.count({ where: { tripId: trip.id } });

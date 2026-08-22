@@ -132,7 +132,11 @@ erDiagram
         int id PK
         string name
         string country
+        string country_code
         string region
+        decimal latitude
+        decimal longitude
+        string timezone
         int cost_index
         int popularity_score
     }
@@ -142,6 +146,7 @@ erDiagram
         string name
         string category
         decimal cost
+        string currency_code
     }
     TRIPS {
         int id PK
@@ -173,6 +178,7 @@ erDiagram
         int trip_id FK
         enum category
         decimal amount
+        string currency_code
         date expense_date
     }
     SAVED_DESTINATIONS {
@@ -212,6 +218,12 @@ erDiagram
 - `saved_destinations` — composite primary key `(user_id, city_id)`, preventing duplicate saves
 - `trip_shares.share_token` — `UNIQUE`, used to look up a shared itinerary without exposing the internal trip id
 - CHECK constraints (added in the `add_check_constraints` migration, since Prisma's schema DSL doesn't express arbitrary CHECKs): `trips.end_date >= start_date`, `trip_stops.departure_date >= arrival_date`, `itinerary_items.end_time >= start_time`, non-negative `activities.cost`/`duration_hours`, `expenses.amount`, `cities.popularity_score`/`cost_index`
+
+### Global travel support (added in `add_global_travel_and_currency_fields`)
+
+- `cities.country_code` (`CHAR(2)`), `cities.latitude`/`cities.longitude` (`DECIMAL(9,6)`), `cities.timezone` (`VARCHAR(64)`, IANA identifier e.g. `Europe/Paris`, `Asia/Kolkata`, `Asia/Makassar`) — all `NOT NULL`, indexed via `@@index([countryCode])`.
+- `activities.currency_code` and `expenses.currency_code` (`CHAR(3)`, ISO-style e.g. `EUR`, `USD`, `INR`) — plain strings, **not** a DB enum, so new currencies never require a migration.
+- `id` stays `Int`/autoincrement everywhere (not UUID) — the Express API is expected to expose ids as strings and convert at the repository boundary (`Number(id)` on the way in, `String(id)` on the way out).
 
 ## 9. Important IDs / relationships for API integration
 
